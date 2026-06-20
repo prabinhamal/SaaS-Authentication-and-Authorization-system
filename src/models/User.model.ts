@@ -9,7 +9,7 @@ import {
 
 const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
   {
-    username: {
+    userName: {
       type: String,
       required: true,
       minLength: [3, "Name must contain at least 3 characters."],

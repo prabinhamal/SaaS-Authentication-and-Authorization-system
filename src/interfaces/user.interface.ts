@@ -10,18 +10,18 @@ interface IProviders {
 
 /// interface for user model
 export interface IUser extends Document {
-  username: string;
+  userName: string;
   email: string;
   passwordHash?: string;
   isEmailVerified?: boolean;
-  authProvider?: [AuthProvider];
-  role?: UserRole;
-  providers: IProviders;
+  authProvider: [AuthProvider];
+  role: UserRole;
+  providers?: IProviders;
   status: AccountStatus;
   avatarUrl?: string;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
   deletedAt?: Date;
-  lastLoginAt: Date,
+  lastLoginAt?: Date,
 }
