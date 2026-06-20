@@ -4,10 +4,13 @@ import { AppError } from "../utils/AppError";
 dotenv.config();
 
 interface Config {
-  port?: string;
-  mongoDBURL?: string;
+  port: string;
+  mongoDBURL: string;
   frontendOrigin1?: string;
   frontendOrigin2?: string;
+  resendApi?: string,
+  appEmail?: string,
+  emailPass?: string
 }
 
 /// read env file and retrive value
@@ -25,7 +28,9 @@ const _config: Config = {
   mongoDBURL: requireEnv("MONGODB_URI"),
   frontendOrigin1: requireEnv("FRONTEND_ORIGIN_1"),
   frontendOrigin2: requireEnv("FRONTEND_ORIGIN_2"),
-
+  resendApi: requireEnv("RESEND_API_KEY"),
+  appEmail: requireEnv("EMAIL_USER"),
+  emailPass: requireEnv("EMAIL_PASS")
 };
 
 type ConfigKey = keyof Config;
