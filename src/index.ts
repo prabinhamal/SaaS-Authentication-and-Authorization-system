@@ -6,6 +6,9 @@ import { errorMiddleware, notFoundHandler } from "./middleware/error.middleware"
 import { BadRequestError } from "./utils/AppError";
 import config from "./config/config";
 
+import authRouter from "./routes/auth.route"
+import cookieParser from "cookie-parser";
+
 
 const app: Express = express();
 
@@ -13,14 +16,12 @@ const PORT: number = Number(config.get("port")) || 3001;
 
 app.use(bodyParser.json());
 app.use(express.json())
+app.use(cookieParser())
 
 
 
 connectDatabase();
-app.get("/", (req: Request, res: Response, next): void => {
-    next( new BadRequestError("Request is bad this is "));
-});
-
+app.use("/api/v1/", authRouter)
 
 /// global error handel
 app.use(notFoundHandler);

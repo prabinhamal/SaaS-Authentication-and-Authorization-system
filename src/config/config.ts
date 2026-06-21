@@ -10,7 +10,9 @@ interface Config {
   frontendOrigin2?: string;
   resendApi?: string,
   appEmail?: string,
-  emailPass?: string
+  emailPass?: string,
+  jwtSecret?: string,
+  jwtRefreshSecret?: string,
 }
 
 /// read env file and retrive value
@@ -30,7 +32,9 @@ const _config: Config = {
   frontendOrigin2: requireEnv("FRONTEND_ORIGIN_2"),
   resendApi: requireEnv("RESEND_API_KEY"),
   appEmail: requireEnv("EMAIL_USER"),
-  emailPass: requireEnv("EMAIL_PASS")
+  emailPass: requireEnv("EMAIL_PASS"),
+  jwtSecret: requireEnv("ACCESS_TOKEN_SECRET"),
+  jwtRefreshSecret: requireEnv("REFRESH_TOKEN_SECRET")
 };
 
 type ConfigKey = keyof Config;

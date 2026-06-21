@@ -24,9 +24,10 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
       trim: true,
     },
 
-    passwordHash: {
+    password: {
       type: String,
       default: null,
+      select: false
     },
 
     isEmailVerified: {

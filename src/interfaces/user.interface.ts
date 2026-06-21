@@ -1,6 +1,8 @@
-import { AccountStatus, AuthProvider, UserRole } from "../constants/user.constants";
-
-
+import {
+  AccountStatus,
+  AuthProvider,
+  UserRole,
+} from "../constants/user.constants";
 
 /// interface for auth provider
 interface IProviders {
@@ -12,7 +14,7 @@ interface IProviders {
 export interface IUser extends Document {
   userName: string;
   email: string;
-  passwordHash?: string;
+  password?: string;
   isEmailVerified?: boolean;
   authProvider: [AuthProvider];
   role: UserRole;
@@ -23,5 +25,5 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   deletedAt?: Date;
-  lastLoginAt?: Date,
+  lastLoginAt?: Date;
 }
