@@ -58,6 +58,8 @@ class authService {
 
     return user;
   }
+
+
 }
 
 export default new authService();

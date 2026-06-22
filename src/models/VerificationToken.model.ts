@@ -1,6 +1,6 @@
-import mongoose, {Schema, Model} from "mongoose";
+import mongoose, {Schema, Model, Types} from "mongoose";
 
-enum Type {
+export enum TokenOtpType {
     EMAIL_VERIFICATION= "EMAIL_VERIFICATION",
     PASSWORD_RESET = "PASSWORD_RESET",
     OTP = "OTP"
@@ -8,19 +8,21 @@ enum Type {
 }
 
 interface TokenVerifaction {
-    userId: mongoose.Schema.Types.ObjectId;
+    userId: Types.ObjectId;
     token: string;
-    type: Type;
+    type: TokenOtpType;
     expiresAt: Date;
     usedAt: Date;
+    used: boolean,
     createdAt: Date;
 }
 
-const tokenSchema: Schema<TokenVerifaction> = new Schema<TokenVerifaction>({
+const tokenSchema: Schema<TokenVerifaction> = new mongoose.Schema<TokenVerifaction>({
 
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: [true, "User Id is required"],
+        ref: "User"
     },
     token: {
         type: String,
@@ -28,12 +30,16 @@ const tokenSchema: Schema<TokenVerifaction> = new Schema<TokenVerifaction>({
     },
     type: {
         type: String,
-        enum: Type,
+        enum: TokenOtpType,
         required: [true, "Token type is required."]
     },
     expiresAt: {
         type: Date,
-        default: ()=>new Date(Date.now() + (15*60*100)),
+        default: ()=> new Date(Date.now() + (15*60*100)),
+    },
+    used:{
+        type: Boolean,
+        default: false,
     },
     usedAt: Date
 

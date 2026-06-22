@@ -1,13 +1,13 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express } from "express";
 import bodyParser from "body-parser";
 import cors from "cors"
 import connectDatabase from "./config/connectDB";
 import { errorMiddleware, notFoundHandler } from "./middleware/error.middleware";
-import { BadRequestError } from "./utils/AppError";
 import config from "./config/config";
 
 import authRouter from "./routes/auth.route"
 import cookieParser from "cookie-parser";
+import userRouter from "./routes/user.route"
 
 
 const app: Express = express();
@@ -22,6 +22,7 @@ app.use(cookieParser())
 
 connectDatabase();
 app.use("/api/v1/", authRouter)
+app.use("/api/v1/", userRouter)
 
 /// global error handel
 app.use(notFoundHandler);
