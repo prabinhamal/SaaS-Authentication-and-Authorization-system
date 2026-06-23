@@ -21,8 +21,7 @@ export const RegisterUserSchema = z.object({
     .email("Invalid email address")
     .transform((email) => email.toLowerCase().trim()),
   password: z.string().min(6).regex(passwordRegex, {
-    message:
-      "Password must contain uppercase, lowercase, number and special characters.",
+    message:"Password must contain uppercase, lowercase, number and special characters.",
   }),
 }).strict();
 
@@ -33,10 +32,20 @@ export const LoginUserSchema = z.object({
   password: z.string()
 }).strict()
 
+export const resetPassword = z.object({
+  newPassword: z.string().min(6).regex(passwordRegex, {
+    message: "Password must contain uppercase, lowercase, number and special characters.",
+  })
+}).strict()
+
 export type RegisterUserInput = z.infer<
   typeof RegisterUserSchema
 >;
 
 export type LoginUserInput = z.infer<
 typeof LoginUserSchema
+>
+
+export type ResetpasswordInput = z.infer<
+typeof resetPassword
 >
