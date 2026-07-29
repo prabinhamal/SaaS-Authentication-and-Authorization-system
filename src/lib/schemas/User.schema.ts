@@ -23,6 +23,7 @@ export const RegisterUserSchema = z.object({
   password: z.string().min(6).regex(passwordRegex, {
     message:"Password must contain uppercase, lowercase, number and special characters.",
   }),
+  rememberMe: z.boolean().optional(),
 }).strict();
 
 

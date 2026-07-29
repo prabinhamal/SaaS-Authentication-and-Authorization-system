@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import config from "../config/config";
 import { AuthProvider, UserRole } from "../constants/user.constants";
+import { TokenPayload } from "../types";
 
 const JWT_SECRET = config.get("jwtSecret");
 
@@ -12,28 +13,17 @@ export interface AccessTokenPayload {
 }
 
 
-/**
- * 
- * @param payload AccessTokenPayload
- * @returns return string as token
- */
-export const generateAccessToken = (payload: AccessTokenPayload): string => {
-  const token = jwt.sign(
-    {
-      _id: payload._id,
-      email: payload.email,
-      role: payload.role,
-      authProvider: payload.authProvider,
-    },
-    JWT_SECRET,
-    {
-      expiresIn: "24h",
-      algorithm: "HS256",
-    },
-  );
-  return token;
-};
+export const generateAccessToken = (payload: TokenPayload) =>
+    jwt.sign(payload, JWT_SECRET, {
+        algorithm: "HS256",
+        expiresIn: "15m",
+    });
 
+export const generateRefreshToken = (payload: TokenPayload) =>
+    jwt.sign(payload, JWT_SECRET, {
+        algorithm: "HS256",
+        expiresIn: "7d",
+    });
 /**
  * 
  * @param token => set in user browser cookies

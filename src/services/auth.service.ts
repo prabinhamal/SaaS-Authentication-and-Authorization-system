@@ -1,10 +1,9 @@
 import { IUser } from "../interfaces/user.interface";
-import { HydratedDocFromModel, HydratedDocument } from "mongoose";
+import { HydratedDocument } from "mongoose";
 import UserModel from "../models/User.model";
 import {
   BadRequestError,
   ConflictError,
-  NotFoundError,
   UnAuthorizedError,
 } from "../utils/AppError";
 import { hashData, verifyHash } from "../utils/hash.utils";
@@ -14,6 +13,18 @@ import {
   AuthProvider,
   UserRole,
 } from "../constants/user.constants";
+import deviceService, { DeviceRequestInfo } from "./device.service";
+import sessionService from "./session.service";
+import tokenService from "./token.service";
+
+export interface LoginResult {
+  user: HydratedDocument<IUser>;
+
+  accessToken: string;
+
+  refreshToken: string;
+  deviceId: string;
+}
 
 class authService {
   async register(data: RegisterUserInput): Promise<HydratedDocument<IUser>> {
@@ -37,10 +48,14 @@ class authService {
     });
   }
 
-
   //// user Login
-  async login(data: LoginUserInput): Promise<HydratedDocument<IUser>> {
-    const user = await UserModel.findOne({ email: data.email }).select("+password");
+  async login(
+    data: LoginUserInput,
+    requestInfo: DeviceRequestInfo,
+  ): Promise<LoginResult> {
+    const user = await UserModel.findOne({ email: data.email }).select(
+      "+password",
+    );
     if (!user) throw new UnAuthorizedError("Invalid email or password.");
 
     /// if user find then check password is match or not
@@ -56,10 +71,38 @@ class authService {
     if (user.status !== AccountStatus.ACTIVE)
       throw new UnAuthorizedError("Accoun is not active.");
 
-    return user;
+    const device = deviceService.getDeviceInfo(requestInfo);
+
+    const sessionId = sessionService.generateSessionId();
+
+    const refresh = tokenService.createRefreshToken({
+      userId: user._id.toString(),
+      sessionId,
+    });
+
+    await sessionService.createSession(
+      {
+        userId: user._id.toString(),
+        refreshTokenHash: refresh.hash,
+        device,
+        rememberMe: false,
+        loginMethod: "password",
+      },
+      sessionId,
+    );
+
+    const accessToken = tokenService.createAccessToken({
+      userId: user._id.toString(),
+      sessionId,
+    });
+
+    return {
+      user,
+      accessToken,
+      refreshToken: refresh.token,
+      deviceId: device.id,
+    };
   }
-
-
 }
 
 export default new authService();

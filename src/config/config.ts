@@ -13,6 +13,7 @@ interface Config {
   emailPass?: string,
   jwtSecret?: string,
   jwtRefreshSecret?: string,
+  redis_url?: string
 }
 
 /// read env file and retrive value
@@ -34,7 +35,8 @@ const _config: Config = {
   appEmail: requireEnv("EMAIL_USER"),
   emailPass: requireEnv("EMAIL_PASS"),
   jwtSecret: requireEnv("ACCESS_TOKEN_SECRET"),
-  jwtRefreshSecret: requireEnv("REFRESH_TOKEN_SECRET")
+  jwtRefreshSecret: requireEnv("REFRESH_TOKEN_SECRET"),
+  redis_url: requireEnv("REDIS_URL")
 };
 
 type ConfigKey = keyof Config;

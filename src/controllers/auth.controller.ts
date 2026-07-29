@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import authService from "../services/auth.service";
-import { generateAccessToken } from "../utils/jwtToken.utils";
+import { DeviceRequestInfo } from "../services/device.service";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -8,25 +8,10 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
     //    create cookie
 
-    const token = generateAccessToken({
-      _id: user._id.toString(),
-      email: user.email,
-      role: user.role,
-      authProvider: user.authProvider,
-    });
-
-    res.cookie("authToken", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 60*60*24
-    });
-
     res.status(200).json({
       success: true,
       message: "User Create Succesfull",
       user,
-      token,
     });
   } catch (error) {
     next(error);
@@ -35,29 +20,42 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await authService.login(req.body);
+    const requestInfo: DeviceRequestInfo = {
+      ipAddress: req.ip ?? "",
+      userAgent: req.get("user-agent") ?? "",
+      deviceId: req.cookies.deviceId,
+    };
 
-    //    create cookie
+    const result = await authService.login(req.body, requestInfo);
 
-    const token = generateAccessToken({
-      _id: user._id.toString(),
-      email: user.email,
-      role: user.role,
-      authProvider: user.authProvider,
-    });
-
-    res.cookie("authToken", token, {
+    /// Set Cookies
+    res.cookie("accessToken", result.accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-       maxAge: 60*60*24
+      maxAge: 15 * 60 * 1000,
     });
 
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie("deviceId", result.deviceId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+    });
+
+    //// Send Response
     res.status(200).json({
       success: true,
-      message: "User Login succesfull.",
-      user,
-      token,
+      message: "User login successful.",
+      user: result.user,
+      accessToken: result.accessToken,
     });
   } catch (error) {
     next(error);

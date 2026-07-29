@@ -8,12 +8,19 @@ import config from "./config/config";
 import authRouter from "./routes/auth.route"
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.route"
-import { connectRedis, redisClient } from "./config/redis.config";
+import { connectRedis } from "./config/redis.config";
 
 
 const app: Express = express();
 
 const PORT: number = Number(config.get("port")) || 3001;
+
+app.use(
+  cors({
+    origin: config.get("frontendOrigin2"),
+    credentials: true,
+  })
+);
 
 app.use(bodyParser.json());
 app.use(express.json())

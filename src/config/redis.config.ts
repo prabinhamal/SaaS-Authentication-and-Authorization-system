@@ -1,9 +1,10 @@
 import { createClient, RedisClientType } from "redis";
+import config from "./config";
 
 /// create redis client
 
 export const redisClient: RedisClientType = createClient({
-  url: "redis://localhost:6379",
+  url: config.get('redis_url'),
   socket: {
     keepAlive: true,
     reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
@@ -23,10 +24,10 @@ redisClient.on("end", () => {
 });
 
 redisClient.on("error", (error) => {
-  console.log("\n---------------- Redis Error ------------- ");
+  console.log("\n Redis Error  ");
   console.log("Message: ", error?.message);
   console.log("code: ", error?.code);
-  console.log("============== End Redis Error ============ ");
+  console.log("End Redis Error ");
 });
 
 process.on("SIGINT", async () => {
