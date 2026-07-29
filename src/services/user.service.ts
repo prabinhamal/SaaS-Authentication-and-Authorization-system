@@ -8,7 +8,6 @@ import { IUser } from "../interfaces/user.interface";
 import { emailProvider } from "../messaging/emails/email.service";
 import { EmailProviderType } from "../interfaces/email.interface";
 import { passwordResetEmailTemplate } from "../messaging/templates/resetPassword.template";
-import { ResetpasswordInput } from "../lib/schemas/User.schema";
 
 interface ForgetResetPasswordResponse {
   message: string;

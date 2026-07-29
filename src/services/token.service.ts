@@ -1,16 +1,8 @@
 
+import { GenerateAccessTokenInput, GenerateRefreshTokenInput } from "../interfaces/token.interface";
 import { TokenPayload } from "../types";
 import { hashToken } from "../utils/CryptoRandom";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwtToken.utils";
-
-export interface GenerateAccessTokenInput {
-  userId: string;
-  sessionId: string;
-}
-export interface GenerateRefreshTokenInput {
-  userId: string;
-  sessionId: string;
-}
 
 class TokenService {
 

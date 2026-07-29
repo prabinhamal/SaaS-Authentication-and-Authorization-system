@@ -2,7 +2,7 @@
 
 import {NextFunction, Request, Response, } from "express"
 import { forgetPassword, resetPassword } from "../services/user.service"
-import { ResetpasswordInput } from "../lib/schemas/User.schema"
+
 
 
 export const resetUserPassword = async (req: Request, res: Response, next: NextFunction) => { 

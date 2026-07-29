@@ -1,4 +1,4 @@
-import { IUser } from "../interfaces/user.interface";
+import { IUser, LoginResult } from "../interfaces/user.interface";
 import { HydratedDocument } from "mongoose";
 import UserModel from "../models/User.model";
 import {
@@ -16,15 +16,6 @@ import {
 import deviceService, { DeviceRequestInfo } from "./device.service";
 import sessionService from "./session.service";
 import tokenService from "./token.service";
-
-export interface LoginResult {
-  user: HydratedDocument<IUser>;
-
-  accessToken: string;
-
-  refreshToken: string;
-  deviceId: string;
-}
 
 class authService {
   async register(data: RegisterUserInput): Promise<HydratedDocument<IUser>> {

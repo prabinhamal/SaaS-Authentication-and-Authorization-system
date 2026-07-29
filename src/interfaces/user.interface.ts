@@ -1,3 +1,4 @@
+import { HydratedDocument } from "mongoose";
 import {
   AccountStatus,
   AuthProvider,
@@ -26,4 +27,13 @@ export interface IUser extends Document {
   updatedAt?: Date;
   deletedAt?: Date;
   lastLoginAt?: Date;
+}
+
+export interface LoginResult {
+  user: HydratedDocument<IUser>;
+
+  accessToken: string;
+
+  refreshToken: string;
+  deviceId: string;
 }
