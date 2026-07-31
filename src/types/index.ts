@@ -41,11 +41,20 @@ export type TokenPayload = {
   sub: string;
   sid: string;
   type: TokenType;
-  iat?: number;
-  exp?: number;
 };
 
 export type AuthenticatedUser = {
   userId: string;
   sessionId: string;
 };
+
+
+export type UserSessions = {
+    sessionId: string,
+    session: SessionPayload
+}
+
+export type GenerateRefreshTokenResult = {
+    refreshToken: string,
+    hash: string,   
+}

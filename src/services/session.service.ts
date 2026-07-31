@@ -1,6 +1,6 @@
 import { redisClient } from "../config/redis.config";
 import { redisSessionSchema } from "../lib/schemas/Session.schema";
-import { CreateSessionInput, LoginMethod, SessionPayload } from "../types";
+import { CreateSessionInput, LoginMethod, SessionPayload, UserSessions } from "../types";
 import { UnAuthorizedError } from "../utils/AppError";
 import { randomBytes } from "../utils/CryptoRandom";
 import { getSessionKey, storeSession } from "../utils/RedisSessionStore";
@@ -101,7 +101,6 @@ class SessionService {
   }
 
   /// verify Refresh token hash
-
   async verifyRefreshTokenHash(sessionId: string, refreshTokenHash: string): Promise<SessionPayload>{
 
     const session = await this.validateSession(sessionId);
@@ -115,11 +114,11 @@ class SessionService {
     await redisClient.del(key)
   }
 
-  async getUserSessiohs(userId: string): Promise<{sessionId: string, session: SessionPayload}[]>{
+  async getUserSessions(userId: string): Promise<UserSessions[]>{
 
     const sessionIds = await redisClient.sMembers(`user:${userId}:sessions`);
 
-    const results: {sessionId: string; session: SessionPayload}[] = [];
+    const sessions: {sessionId: string; session: SessionPayload}[] = [];
     const now = Date.now();
 
     for(const id of sessionIds){
@@ -131,15 +130,13 @@ class SessionService {
             continue
 
         }
-        results.push({sessionId:id, session})
+        sessions.push({sessionId:id, session})
 
     }
 
-    return results;
+    return sessions;
     
   }
-
- 
 
 }
 

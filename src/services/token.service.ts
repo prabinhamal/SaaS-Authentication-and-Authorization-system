@@ -1,37 +1,65 @@
 
 import { GenerateAccessTokenInput, GenerateRefreshTokenInput } from "../interfaces/token.interface";
-import { TokenPayload } from "../types";
+import { tokenSchema } from "../lib/schemas/Token.schema";
+import { GenerateRefreshTokenResult, TokenPayload } from "../types";
+import { UnAuthorizedError } from "../utils/AppError";
 import { hashToken } from "../utils/CryptoRandom";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwtToken.utils";
+import { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken } from "../utils/jwtToken.utils";
 
 class TokenService {
 
-  createAccessToken(input: GenerateAccessTokenInput): string {
+  generateAccessToken(input: GenerateAccessTokenInput): string {
     const payload: TokenPayload = {
         sub: input.userId,
         sid: input.sessionId,
         type: "access"
     }
-    const token = generateAccessToken(payload)
-    return token;
+    const accessToken  = generateAccessToken(payload)
+    return accessToken ;
 
   }
 
-createRefreshToken(input: GenerateRefreshTokenInput) {
+generateRefreshToken(input: GenerateRefreshTokenInput): GenerateRefreshTokenResult {
     const payload: TokenPayload = {
         sub: input.userId,
         sid: input.sessionId,
         type: "refresh",
     };
-    const token = generateRefreshToken(payload);
+    const refreshToken = generateRefreshToken(payload);
     return {
-        token,
-        hash: hashToken(token),
+        refreshToken,
+        hash: hashToken(refreshToken),
     };
 }
 
-//   verifyAccessToken(token: string): AccessTokenPayload {}
+  verifyAccessToken(token: string): TokenPayload {
 
-//   verifyRefreshToken(token: string): RefreshTokenPayload {}
+    /// verify and decode jwt 
+    const decodedAccessToken = verifyAccessToken(token)
+
+    /// zod validate structure and type of data
+    const result = tokenSchema.safeParse(decodedAccessToken)
+    
+    if(!result.success){
+  throw new UnAuthorizedError("Invalid access token")
+    }
+
+    return result.data
+
+ }
+
+  verifyRefreshToken(token: string): TokenPayload {
+
+    /// verify and decode jwt 
+    const decodedAccessToken = verifyRefreshToken(token)
+
+    /// zod validate structure and type of data
+    const result = tokenSchema.safeParse(decodedAccessToken)
+    
+    if(!result.success){
+throw new UnAuthorizedError("Invalid refresh token")
+    }
+    return result.data
+ }
 }
 export default new TokenService();

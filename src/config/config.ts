@@ -11,7 +11,7 @@ interface Config {
   resendApi?: string,
   appEmail?: string,
   emailPass?: string,
-  jwtSecret?: string,
+  jwtAccessSecret?: string,
   jwtRefreshSecret?: string,
   redis_url?: string
 }
@@ -34,7 +34,7 @@ const _config: Config = {
   resendApi: requireEnv("RESEND_API_KEY"),
   appEmail: requireEnv("EMAIL_USER"),
   emailPass: requireEnv("EMAIL_PASS"),
-  jwtSecret: requireEnv("ACCESS_TOKEN_SECRET"),
+  jwtAccessSecret: requireEnv("ACCESS_TOKEN_SECRET"),
   jwtRefreshSecret: requireEnv("REFRESH_TOKEN_SECRET"),
   redis_url: requireEnv("REDIS_URL")
 };

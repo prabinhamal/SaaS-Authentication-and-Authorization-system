@@ -66,7 +66,7 @@ class authService {
 
     const sessionId = sessionService.generateSessionId();
 
-    const refresh = tokenService.createRefreshToken({
+    const refresh = tokenService.generateRefreshToken({
       userId: user._id.toString(),
       sessionId,
     });
@@ -82,7 +82,7 @@ class authService {
       sessionId,
     );
 
-    const accessToken = tokenService.createAccessToken({
+    const accessToken = tokenService.generateAccessToken({
       userId: user._id.toString(),
       sessionId,
     });
@@ -90,7 +90,7 @@ class authService {
     return {
       user,
       accessToken,
-      refreshToken: refresh.token,
+      refreshToken: refresh.refreshToken,
       deviceId: device.id,
     };
   }
