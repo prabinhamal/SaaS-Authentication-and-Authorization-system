@@ -7,7 +7,7 @@ export interface DeviceRequestInfo {
 
 import { UAParser } from "ua-parser-js";
 import { DeviceInfo } from "../types";
-import { randomBytes } from "../utils/CryptoRandom";
+import tokenService from "./token.service";
 
 class DeviceService {
   getDeviceInfo(request: DeviceRequestInfo): DeviceInfo {
@@ -17,7 +17,7 @@ class DeviceService {
     const os = parser.getOS();
 
     return {
-      id: request.deviceId ?? randomBytes(32),
+      id: request.deviceId ?? tokenService.generateDeviceId(),
 
       name: this.getDeviceName(browser.name, os.name),
 

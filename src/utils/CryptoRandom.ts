@@ -2,7 +2,7 @@
 import crypto from "crypto"
 
 export const randomBytes = (bytes: number): string =>{
-const randomBytes = crypto.randomBytes(32).toString('hex')
+const randomBytes = crypto.randomBytes(bytes).toString('hex')
 return randomBytes
 }
 

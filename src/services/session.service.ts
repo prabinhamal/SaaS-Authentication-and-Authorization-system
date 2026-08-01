@@ -11,7 +11,16 @@ export const REMEMBER_ME_REFRESH_TOKEN_TTL = 30 * 24 * 60 * 60 * 1000; //// 30 d
 class SessionService {
   generateSessionId(): string {
     return randomBytes(32);
-  }
+}
+/// responsible for update every field in session
+private async updateSession(
+  sessionId: string,
+  updates: Record<string, string>,
+): Promise<void> {
+  const key = getSessionKey(sessionId);
+
+  await redisClient.hSet(key, updates);
+}
 
   async createSession(
     input: CreateSessionInput,
@@ -67,15 +76,6 @@ class SessionService {
     return session;
   }
 
-  /// responsible for update every field in session
-  private async updateSession(
-    sessionId: string,
-    updates: Record<string, string>,
-  ): Promise<void> {
-    const key = getSessionKey(sessionId);
-
-    await redisClient.hSet(key, updates);
-  }
 
   /// update lastseen timestamp
   async touchSession(sessionId: string): Promise<void> {
