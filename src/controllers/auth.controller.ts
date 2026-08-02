@@ -1,19 +1,23 @@
 import { NextFunction, Request, Response } from "express";
 import authService from "../services/auth.service";
 import { DeviceRequestInfo } from "../services/device.service";
-import tokenService from "../services/token.service";
+import tokenService, {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "../services/token.service";
+import { ResponseSend } from "../utils/response";
+import { HTTP_STATUS } from "../constants/app.constant";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await authService.register(req.body);
-
-    //    create cookie
-
-    res.status(200).json({
-      success: true,
-      message: "User Create Succesfull",
+    return ResponseSend.success(
+      res,
+      "User created successfully.",
       user,
-    });
+      HTTP_STATUS.CREATED,
+    );
   } catch (error) {
     next(error);
   }
@@ -33,18 +37,124 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
       deviceId: result.deviceId,
-      rememberMe: false,
+      rememberMe: req.body.rememberMe ?? false,
     });
     //// Send Response
-    res.status(200).json({
-      success: true,
-      message: "User login successful.",
-      user: result.user,
-      accessToken: result.accessToken,
-    });
+    return ResponseSend.success(
+      res,
+      "User logged in successfully.",
+      { user: result.user, accessToken: result.accessToken },
+      HTTP_STATUS.OK,
+    );
   } catch (error) {
     next(error);
   }
 };
 
-export { register, login };
+const refreshTokens = asyncHandler(async (req: Request, res: Response) => {
+  /// read user request
+  const refreshToken = req.cookies.refreshToken;
+  const result = await authService.refreshTokens(refreshToken);
+
+  /// set cookies
+  tokenService.setAuthCookies({
+    response: res,
+    accessToken: result.accessToken,
+    refreshToken: result.refreshToken,
+    deviceId: result.deviceId,
+  });
+
+  return ResponseSend.success(
+    res,
+    "Token refreshed successfully",
+    { user: result.user, accessToken: result.accessToken },
+    HTTP_STATUS.OK,
+  );
+});
+
+const logout = asyncHandler(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
+  await authService.logout(refreshToken);
+  tokenService.clearAuthCookies(res);
+  return ResponseSend.success(
+    res,
+    "Logged out successfully.",
+    null,
+    HTTP_STATUS.OK,
+  );
+});
+
+const logoutAll = asyncHandler(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
+  await authService.logoutAllSessions(refreshToken);
+  tokenService.clearAuthCookies(res);
+
+  return ResponseSend.success(
+    res,
+    "All sessions have been logged out successfully.",
+    null,
+    HTTP_STATUS.OK,
+  );
+});
+
+const getMe = asyncHandler(async (req: Request, res: Response) => {
+  const accessToken = req.cookies[ACCESS_TOKEN_COOKIE];
+  const user = await authService.getCurrentUser(accessToken);
+  return ResponseSend.success(
+    res,
+    "Current user retrieved successfully.",
+    user,
+    HTTP_STATUS.OK,
+  );
+});
+
+const changePassword = asyncHandler(async (req: Request, res: Response) => {
+  const accessToken = req.cookies[ACCESS_TOKEN_COOKIE];
+  const { oldPassword, newPassword } = req.body;
+  await authService.changePassword({ accessToken, oldPassword, newPassword });
+  tokenService.clearAuthCookies(res);
+
+  return ResponseSend.success(
+    res,
+    "Your password has been changed successfully.",
+    null,
+    HTTP_STATUS.OK,
+  );
+});
+
+const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { token } = req.query as { token: string };
+  const { newPassword } = req.body as { newPassword: string };
+  await authService.resetPassword(token,newPassword);
+
+  return ResponseSend.success(
+    res,
+    "Password reset successfully.",
+    null,
+    HTTP_STATUS.OK,
+  );
+});
+
+const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  const {email} = req.body ;
+  await authService.forgotPassword(email);
+
+  return ResponseSend.success(
+    res,
+    "Password reset link sent successfully.",
+    null,
+    HTTP_STATUS.OK
+  );
+});
+
+export {
+  register,
+  login,
+  refreshTokens,
+  logout,
+  logoutAll,
+  getMe,
+  changePassword,
+  resetPassword,
+  forgotPassword
+};

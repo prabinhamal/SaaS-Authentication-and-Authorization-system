@@ -85,7 +85,7 @@ class authService {
         userId: user._id.toString(),
         refreshTokenHash: refresh.hash,
         device,
-        rememberMe: false,
+        rememberMe: data.remamberMe ?? false,
         loginMethod: "password",
       },
       sessionId,
@@ -104,9 +104,9 @@ class authService {
     };
   }
 
-  async forgetPassword   (
+  async forgotPassword   (
   email: string,
-): Promise<ForgetResetPasswordResponse> {
+): Promise<void> {
   //// find user from database
 
   const user = await UserModel.findOne({ email }).lean();
@@ -143,15 +143,15 @@ class authService {
 
    emailService.sendEmail(user.email, "Reset Password", emailBody);
 
-  return {
-    message: "password Resend link is send to you email.",
-  };
+  // return {
+  //   message: "password Resend link is send to you email.",
+  // };
 };
 
 async resetPassword (
-  newPassword: string,
   token: string,
-): Promise<ForgetResetPasswordResponse> {
+  newPassword: string,
+): Promise<void> {
   /// hash plain token and look up database to get forget document.
   const hashtoken = crypto.createHash("sha256").update(token).digest("hex");
 
@@ -179,9 +179,9 @@ async resetPassword (
     { returnDocument: "after" },
   );
 
-  return {
-    message: "Password Reset Succesfull.",
-  };
+  // return {
+  //   message: "Password Reset Succesfull.",
+  // };
 };
 
   /// refreshTokens

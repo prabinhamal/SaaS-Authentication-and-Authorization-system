@@ -12,7 +12,6 @@ router.post("/auth/register", validator(RegisterUserSchema), register)
 
 router.post("/auth/login", validator(LoginUserSchema), login)
 
-
 export default router;
 
 

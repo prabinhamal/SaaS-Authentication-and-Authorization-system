@@ -1,3 +1,5 @@
+import { HTTP_STATUS } from "../constants/app.constant";
+
 interface ErrorObj {
   message: string;
   status: number;
@@ -14,7 +16,7 @@ export class AppError extends Error {
   constructor(
     message = "Internal App Error",
     {
-      status = 500,
+      status = HTTP_STATUS.INTERNAL_SERVER_ERROR,
       code = "INTERNAL_ERROR",
       details = null,
     }: Partial<ErrorObj> = {},
@@ -35,7 +37,7 @@ export class AppError extends Error {
 /// Bad request Error
 export class BadRequestError extends AppError {
   constructor(message: string = "Bad request", details: string | null = null) {
-    super(message, { status: 400, code: "BAD_REQUEST", details });
+    super(message, { status: HTTP_STATUS.BAD_REQUEST, code: "BAD_REQUEST", details });
   }
 }
 
@@ -43,7 +45,7 @@ export class BadRequestError extends AppError {
 
 export class NotFoundError extends AppError {
   constructor(message: string = "Not Found!", details: string | null = null) {
-    super(message, { status: 404, code: "NOT_FOUND", details });
+    super(message, { status: HTTP_STATUS.NOT_FOUND, code: "NOT_FOUND", details });
   }
 }
 
@@ -51,21 +53,21 @@ export class NotFoundError extends AppError {
 /// 
 export class UnAuthorizedError extends AppError{
     constructor(message: string = "Unauthorized", details: string | null = null){
-        super(message, {status: 401, code:"UNAUTHORIZED", details})
+        super(message, {status: HTTP_STATUS.UNAUTHORIZED, code:"UNAUTHORIZED", details})
     }
 }
 
 export class ForbiddenError extends AppError{
 
     constructor(message: string = "Forbidden", details: string | null = null){
-        super(message, {status: 403, code: "FORBIDDEN", details})
+        super(message, {status: HTTP_STATUS.FORBIDDEN, code: "FORBIDDEN", details})
     }
 
 }
 
 export class ConflictError extends AppError {
     constructor(message = "Conflict", details: string | null = null) {
-        super(message, {status: 409, code: "CONFLICT", details});
+        super(message, {status: HTTP_STATUS.CONFLICT, code: "CONFLICT", details});
     }
 }
 
