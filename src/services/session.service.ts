@@ -138,6 +138,15 @@ private async updateSession(
     
   }
 
+  async revokeAllUserSessions(userId: string): Promise<void>{
+        /// get all session
+    const sessions = await this.getUserSessions(userId)
+    
+    for(const session of sessions){
+      await this.revokeSession(session.sessionId)
+    }
+  }
+
 }
 
 export default new SessionService();

@@ -92,3 +92,9 @@ export const forgetPassword = async (
     message: "password Resend link is send to you email.",
   };
 };
+
+export const getUserById = async (id: string): Promise<IUser>=>{
+const user = await UserModel.findById(id)
+if(!user) throw new NotFoundError("User not found");
+return user;
+}

@@ -1,6 +1,7 @@
 ///
 
 import { Response } from "express";
+import { IUser } from "../interfaces/user.interface";
 
 export type LoginMethod = "password" | "google" | "github";
 
@@ -28,7 +29,7 @@ interface SessionBase {
 }
 
 export interface CreateSessionInput extends SessionBase {
-    rememberMe: boolean;
+  rememberMe: boolean;
 }
 
 export interface SessionPayload extends SessionBase {
@@ -50,21 +51,34 @@ export type AuthenticatedUser = {
   sessionId: string;
 };
 
-
 export type UserSessions = {
-    sessionId: string,
-    session: SessionPayload
-}
+  sessionId: string;
+  session: SessionPayload;
+};
 
 export type GenerateRefreshTokenResult = {
-    refreshToken: string,
-    hash: string,   
-}
+  refreshToken: string;
+  hash: string;
+};
 
 export type CookiesInput = {
-  response: Response,
+  response: Response;
+  accessToken: string;
+  refreshToken: string;
+  deviceId: string;
+  rememberMe?: boolean;
+};
+
+export interface RefreshTokensResult {
+  accessToken: string;
+  refreshToken: string;
+  rememberMe?: boolean;
+  deviceId: string;
+  user: IUser;
+}
+
+export interface ChangePassInput {
   accessToken: string,
-  refreshToken: string,
-  deviceId: string,
-  rememberMe?: boolean
+  oldPassword: string;
+  newPassword: string;
 }
