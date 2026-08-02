@@ -1,26 +1,32 @@
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 import {
   AccountStatus,
   AuthProvider,
   UserRole,
 } from "../constants/user.constants";
 
-/// interface for auth provider
 interface IProviders {
   googleId?: string;
   githubId?: string;
 }
 
-/// interface for user model
-export interface IUser extends Document {
+export interface IUser {
+  _id: Types.ObjectId;
+
   userName: string;
   email: string;
   password?: string;
+
   isEmailVerified?: boolean;
-  authProvider: [AuthProvider];
+
+  authProvider: AuthProvider[];
+
   role: UserRole;
+
   providers?: IProviders;
+
   status: AccountStatus;
+
   avatarUrl?: string;
 
   createdAt?: Date;
@@ -29,11 +35,21 @@ export interface IUser extends Document {
   lastLoginAt?: Date;
 }
 
+export type UserDocument = HydratedDocument<IUser>;
+
+export interface AuthUser {
+  _id: string;
+  userName: string;
+  email: string;
+  role: UserRole;
+  authProvider: AuthProvider[];
+  status: AccountStatus;
+  avatarUrl?: string;
+}
+
 export interface LoginResult {
-  user: HydratedDocument<IUser>;
-
+  user: UserDocument;
   accessToken: string;
-
   refreshToken: string;
   deviceId: string;
 }

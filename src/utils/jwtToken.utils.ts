@@ -6,12 +6,6 @@ import { TokenPayload } from "../types";
 const JWT_ACCESS_SECRET = config.get("jwtAccessSecret");
 const JWT_REFRESH_SECREAT = config.get("jwtRefreshSecret");
 
-export interface AccessTokenPayload {
-  _id: string;
-  email: string;
-  role: UserRole;
-  authProvider: AuthProvider[];
-}
 
 export const generateAccessToken = (payload: TokenPayload) =>
   jwt.sign(payload, JWT_ACCESS_SECRET, {

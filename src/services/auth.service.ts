@@ -1,6 +1,10 @@
-import { IUser, LoginResult } from "../interfaces/user.interface";
+import {
+  AuthUser,
+  IUser,
+  LoginResult,
+} from "../interfaces/user.interface";
 import { HydratedDocument } from "mongoose";
-import crypto from "crypto"
+import crypto from "crypto";
 import UserModel from "../models/User.model";
 import {
   BadRequestError,
@@ -18,7 +22,10 @@ import {
 import deviceService, { DeviceRequestInfo } from "./device.service";
 import sessionService from "./session.service";
 import tokenService from "./token.service";
-import { ChangePassInput, ForgetResetPasswordResponse, RefreshTokensResult } from "../types";
+import {
+  ChangePassInput,
+  RefreshTokensResult,
+} from "../types";
 import { hashToken, randomBytes } from "../utils/CryptoRandom";
 import userService from "./user.service";
 import TokenModel, { TokenOtpType } from "../models/VerificationToken.model";
@@ -104,85 +111,83 @@ class authService {
     };
   }
 
-  async forgotPassword   (
-  email: string,
-): Promise<void> {
-  //// find user from database
+  async forgotPassword(email: string): Promise<void> {
+    //// find user from database
 
-  const user = await UserModel.findOne({ email }).lean();
+    const user = await UserModel.findOne({ email }).lean();
 
-  if (!user)
-    throw new BadRequestError(
-      "If an account existsm, a reset link has been sent.",
+    if (!user)
+      throw new BadRequestError(
+        "If an account existsm, a reset link has been sent.",
+      );
+
+    /// generate token for reset password.
+
+    const token = randomBytes(32); /// create random 32 bytes characters.
+    const hashtoken = crypto.createHash("sha256").update(token).digest("hex"); /// hash that random characters.
+
+    const link: string = `http://localhost:3000/api/v1/auth/reset-password?token=${token}`;
+
+    /// before create new we delete older token
+    await TokenModel.deleteMany({
+      userId: user._id,
+      type: TokenOtpType.PASSWORD_RESET,
+    });
+
+    //// create new one token.
+    await TokenModel.create({
+      userId: user._id,
+      token: hashtoken,
+      type: TokenOtpType.PASSWORD_RESET,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000), ////expired on 15 minutes
+    });
+
+    const emailBody = passwordResetEmailTemplate(user.userName, link);
+
+    const emailService = emailProvider(EmailProviderType.NODEMAILER);
+
+    emailService.sendEmail(user.email, "Reset Password", emailBody);
+
+    // return {
+    //   message: "password Resend link is send to you email.",
+    // };
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    /// hash plain token and look up database to get forget document.
+    const hashtoken = crypto.createHash("sha256").update(token).digest("hex");
+
+    /// first find user by email and update
+    const forgetData = await TokenModel.findOneAndUpdate(
+      {
+        token: hashtoken,
+        type: TokenOtpType.PASSWORD_RESET,
+        used: false,
+        expiresAt: { $gt: new Date(Date.now()) }, /// only return and update when Now Date is grater then that data.
+      },
+      { used: true, usedAt: new Date(Date.now()) },
+      {
+        returnDocument: "before",
+      },
     );
 
-  /// generate token for reset password.
+    if (!forgetData)
+      throw new BadRequestError("Invalid, expired or alrady used Link.");
+    /// link is expire or not
 
-  const token = randomBytes(32) /// create random 32 bytes characters.
-  const hashtoken = crypto.createHash("sha256").update(token).digest("hex");  /// hash that random characters.
+    //// hash password first
+    const passwordHash: string = await hashData(newPassword);
 
-  const link: string = `http://localhost:3000/api/v1/auth/reset-password?token=${token}`;
+    await UserModel.findByIdAndUpdate(
+      { _id: forgetData.userId },
+      { password: passwordHash },
+      { returnDocument: "after" },
+    );
 
-  /// before create new we delete older token
-  await TokenModel.deleteMany({
-    userId: user._id,
-    type: TokenOtpType.PASSWORD_RESET,
-  });
-
-  //// create new one token.
-  await TokenModel.create({
-    userId: user._id,
-    token: hashtoken,
-    type: TokenOtpType.PASSWORD_RESET,
-    expiresAt: new Date(Date.now() + 15 * 60 * 1000), ////expired on 15 minutes
-  });
-
-  const emailBody = passwordResetEmailTemplate(user.userName, link);
-
-  const emailService = emailProvider(EmailProviderType.NODEMAILER);
-
-   emailService.sendEmail(user.email, "Reset Password", emailBody);
-
-  // return {
-  //   message: "password Resend link is send to you email.",
-  // };
-};
-
-async resetPassword (
-  token: string,
-  newPassword: string,
-): Promise<void> {
-  /// hash plain token and look up database to get forget document.
-  const hashtoken = crypto.createHash("sha256").update(token).digest("hex");
-
-  /// first find user by email and update
-  const forgetData = await TokenModel.findOneAndUpdate({
-    token: hashtoken,
-    type: TokenOtpType.PASSWORD_RESET,
-    used: false,
-    expiresAt: { $gt: new Date(Date.now()) }, /// only return and update when Now Date is grater then that data.
-    
-  },{ used: true, usedAt: new Date(Date.now()) },{
-    returnDocument: "before"
-  })
-
-  if (!forgetData) throw new BadRequestError("Invalid, expired or alrady used Link.");
-  /// link is expire or not
-
-
-  //// hash password first
-  const passwordHash: string = await hashData(newPassword);
-
-  await UserModel.findByIdAndUpdate(
-    { _id: forgetData.userId },
-    { password: passwordHash },
-    { returnDocument: "after" },
-  );
-
-  // return {
-  //   message: "Password Reset Succesfull.",
-  // };
-};
+    // return {
+    //   message: "Password Reset Succesfull.",
+    // };
+  }
 
   /// refreshTokens
   async refreshTokens(refreshToken: string): Promise<RefreshTokensResult> {
@@ -243,15 +248,24 @@ async resetPassword (
     await sessionService.revokeAllUserSessions(userId);
   }
 
-  async getCurrentUser(accessToken: string): Promise<IUser> {
+  async getCurrentUser(accessToken: string): Promise<AuthUser> {
     const payload = tokenService.verifyAccessToken(accessToken);
     const session = await sessionService.validateSession(payload.sid);
     const user = await userService.getUserById(session.userId);
 
-    if (user.status !== AccountStatus.ACTIVE)
-      throw new UnAuthorizedError("Accoun is not active.");
+    if (user.status !== AccountStatus.ACTIVE) {
+      throw new UnAuthorizedError("Account is not active.");
+    }
 
-    return user;
+    return {
+      _id: user._id.toString(),
+      userName: user.userName,
+      email: user.email,
+      role: user.role,
+      authProvider: user.authProvider,
+      status: user.status,
+      ...(user.avatarUrl && { avatarUrl: user.avatarUrl }),
+    };
   }
 
   async changePassword(input: ChangePassInput): Promise<void> {
@@ -263,9 +277,14 @@ async resetPassword (
 
     /// if user find then check password is match or not
     if (!user.password)
-      throw new BadRequestError("Password login is not available for this account.",);
+      throw new BadRequestError(
+        "Password login is not available for this account.",
+      );
 
-    const isPasswordCorrect = await verifyHash(user.password, input.oldPassword);
+    const isPasswordCorrect = await verifyHash(
+      user.password,
+      input.oldPassword,
+    );
 
     if (!isPasswordCorrect)
       throw new BadRequestError("Current Password is incorrect.");
@@ -273,7 +292,9 @@ async resetPassword (
     const isSamePassword = await verifyHash(user.password, input.newPassword);
 
     if (isSamePassword) {
-      throw new BadRequestError( "New password must be different from the current password.",);
+      throw new BadRequestError(
+        "New password must be different from the current password.",
+      );
     }
 
     const passwordHash = await hashData(input.newPassword);
