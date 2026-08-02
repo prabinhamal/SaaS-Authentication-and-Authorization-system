@@ -1,7 +1,8 @@
 
 
 import {NextFunction, Request, Response, } from "express"
-import { forgetPassword, resetPassword } from "../services/user.service"
+import authService from "../services/auth.service"
+
 
 
 
@@ -12,7 +13,7 @@ export const resetUserPassword = async (req: Request, res: Response, next: NextF
         const {token} = req.query as {token: string}
         const {newPassword} = req.body as {newPassword: string}
 
-        const result = await resetPassword(newPassword, token)
+        const result = await authService.resetPassword(newPassword, token)
 
         res.status(200).json(result)
         
@@ -28,7 +29,7 @@ export const resetUserPassword = async (req: Request, res: Response, next: NextF
     try {
 
         const {email} = req.body as {email: string}
-        const result = await forgetPassword(email)
+        const result = await authService.forgetPassword(email)
 
         res.status(200).json(result)
         

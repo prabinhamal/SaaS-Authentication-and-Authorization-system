@@ -82,3 +82,7 @@ export interface ChangePassInput {
   oldPassword: string;
   newPassword: string;
 }
+
+export interface ForgetResetPasswordResponse {
+  message: string;
+}
