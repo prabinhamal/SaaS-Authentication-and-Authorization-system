@@ -19,19 +19,16 @@ import {
   AuthProvider,
   UserRole,
 } from "../constants/user.constants";
-import deviceService, { DeviceRequestInfo } from "./device.service";
+import deviceService from "./device.service";
 import sessionService from "./session.service";
 import tokenService from "./token.service";
-import {
-  ChangePassInput,
-  RefreshTokensResult,
-} from "../types";
 import { hashToken, randomBytes } from "../utils/CryptoRandom";
 import userService from "./user.service";
 import TokenModel, { TokenOtpType } from "../models/VerificationToken.model";
 import { passwordResetEmailTemplate } from "../messaging/templates/resetPassword.template";
 import { emailProvider } from "../messaging/emails/email.service";
 import { EmailProviderType } from "../interfaces/email.interface";
+import { ChangePasswordInput, DeviceRequestInfo, RefreshTokensResult } from "../interfaces";
 
 class authService {
   async register(data: RegisterUserInput): Promise<HydratedDocument<IUser>> {
@@ -268,7 +265,7 @@ class authService {
     };
   }
 
-  async changePassword(input: ChangePassInput): Promise<void> {
+  async changePassword(input: ChangePasswordInput): Promise<void> {
     const payload = tokenService.verifyAccessToken(input.accessToken);
     const session = await sessionService.validateSession(payload.sid);
 

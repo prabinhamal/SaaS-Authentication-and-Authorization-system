@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from "../constants/app.constant";
 import { AppError, NotFoundError } from "../utils/AppError"
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express"
 
@@ -5,7 +6,7 @@ import { Request, Response, NextFunction, ErrorRequestHandler } from "express"
 
 export const errorMiddleware: ErrorRequestHandler = (err ,req: Request, res: Response, next: NextFunction) => { 
     
-  let status: number = 500;
+  let status: number = HTTP_STATUS.INTERNAL_SERVER_ERROR;
   let code: string = "INTERNAL_ERROR";
   let message: string = "Internal Server Error";
   let details: string | null = null;

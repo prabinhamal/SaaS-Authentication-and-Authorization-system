@@ -40,6 +40,10 @@ export const resetPasswordSchema = z.object({
   })
 }).strict()
 
+export const forgotPasswordSchema = z.object({
+  email: z.email("Invalid emaill address.").transform(((email)=> email.toLocaleLowerCase().trim()))
+})
+
 export type RegisterUserInput = z.infer<
   typeof RegisterUserSchema
 >;
@@ -50,4 +54,9 @@ typeof LoginUserSchema
 
 export type ResetpasswordInput = z.infer<
 typeof resetPasswordSchema
+>
+
+export type ForgetPasswordInput = z.infer<
+typeof forgotPasswordSchema
+
 >

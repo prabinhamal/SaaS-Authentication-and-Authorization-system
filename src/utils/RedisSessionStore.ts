@@ -1,5 +1,6 @@
 import { redisClient } from "../config/redis.config";
-import { SessionPayload } from "../types";
+import { SessionPayload } from "../interfaces";
+
 
 export const getSessionKey = (sessionId: string) => `session:${sessionId}`;
 
@@ -14,21 +15,21 @@ export const storeSession = async (
     throw new Error("Session expiration must be in the future.");
   }
 
-  await redisClient
-    .multi()
-    .hSet(key, {
-      userId: payload.userId,
-      refreshTokenHash: payload.refreshTokenHash,
+const userSessionsKey = `user:${payload.userId}:sessions`;
 
-      device: JSON.stringify(payload.device),
-
-      loginMethod: payload.loginMethod,
-
-      createdAt: payload.createdAt.toString(),
-      lastSeen: payload.lastSeen.toString(),
-      expiresAt: payload.expiresAt.toString(),
-    })
-    .expire(key, ttlSeconds)
-    .exec();
+await redisClient
+  .multi()
+  .sAdd(userSessionsKey, sessionId)
+  .hSet(key, {
+    userId: payload.userId,
+    refreshTokenHash: payload.refreshTokenHash,
+    device: JSON.stringify(payload.device),
+    loginMethod: payload.loginMethod,
+    createdAt: payload.createdAt.toString(),
+    lastSeen: payload.lastSeen.toString(),
+    expiresAt: payload.expiresAt.toString(),
+  })
+  .expire(key, ttlSeconds)
+  .exec();
     
 };

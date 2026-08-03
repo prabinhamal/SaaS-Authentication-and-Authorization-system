@@ -1,13 +1,10 @@
 import {
   GenerateAccessTokenInput,
   GenerateRefreshTokenInput,
-} from "../interfaces/token.interface";
-import { tokenSchema } from "../lib/schemas/Token.schema";
-import {
-  CookiesInput,
   GenerateRefreshTokenResult,
   TokenPayload,
-} from "../types";
+} from "../interfaces/token.interface";
+import { tokenSchema } from "../lib/schemas/Token.schema";
 import type { CookieOptions, Request, Response } from "express";
 
 import { UnAuthorizedError } from "../utils/AppError";
@@ -18,12 +15,8 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
 } from "../utils/jwtToken.utils";
-import { REFRESH_TOKEN_TTL, REMEMBER_ME_REFRESH_TOKEN_TTL } from "./session.service";
-
-
-export const ACCESS_TOKEN_COOKIE = "accessToken";
-export const REFRESH_TOKEN_COOKIE = "refreshToken";
-export const DEVICE_ID_COOKIE = "deviceId";
+import { CookiesInput } from "../interfaces";
+import { ACCESS_TOKEN_COOKIE, DEVICE_ID_COOKIE, REFRESH_TOKEN_COOKIE, REFRESH_TOKEN_TTL, REMEMBER_ME_REFRESH_TOKEN_TTL } from "../constants/auth.constants";
 
 class TokenService {
  private cookieOptions(timestamp: number): CookieOptions {

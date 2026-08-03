@@ -1,13 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import authService from "../services/auth.service";
-import { DeviceRequestInfo } from "../services/device.service";
-import tokenService, {
-  ACCESS_TOKEN_COOKIE,
-  REFRESH_TOKEN_COOKIE,
-} from "../services/token.service";
 import { ResponseSend } from "../utils/response";
 import { HTTP_STATUS } from "../constants/app.constant";
 import { asyncHandler } from "../utils/asyncHandler";
+import sessionService from "../services/session.service";
+import { DeviceRequestInfo } from "../interfaces";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "../constants/auth.constants";
+import tokenService from "../services/token.service";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -75,7 +77,7 @@ const refreshTokens = asyncHandler(async (req: Request, res: Response) => {
 const logout = asyncHandler(async (req: Request, res: Response) => {
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
 
-  if(refreshToken){
+  if (refreshToken) {
     await authService.logout(refreshToken);
   }
   tokenService.clearAuthCookies(res);
@@ -89,12 +91,27 @@ const logout = asyncHandler(async (req: Request, res: Response) => {
 
 const logoutAll = asyncHandler(async (req: Request, res: Response) => {
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE];
-  await authService.logoutAllSessions(refreshToken);
+
+  if (refreshToken) {
+    await authService.logoutAllSessions(refreshToken);
+  }
   tokenService.clearAuthCookies(res);
 
   return ResponseSend.success(
     res,
     "All sessions have been logged out successfully.",
+    null,
+    HTTP_STATUS.OK,
+  );
+});
+
+const logoutBySessionId = asyncHandler(async (req: Request, res: Response) => {
+  const { sessionId } = req.params as { sessionId: string };
+  const id = req.user._id;
+  await sessionService.revokeDeviceSession(id, sessionId);
+  return ResponseSend.success(
+    res,
+    "Logged out successfully.",
     null,
     HTTP_STATUS.OK,
   );
@@ -128,7 +145,7 @@ const changePassword = asyncHandler(async (req: Request, res: Response) => {
 const resetPassword = asyncHandler(async (req: Request, res: Response) => {
   const { token } = req.query as { token: string };
   const { newPassword } = req.body as { newPassword: string };
-  await authService.resetPassword(token,newPassword);
+  await authService.resetPassword(token, newPassword);
 
   return ResponseSend.success(
     res,
@@ -139,14 +156,14 @@ const resetPassword = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
-  const {email} = req.body ;
+  const { email } = req.body;
   await authService.forgotPassword(email);
 
   return ResponseSend.success(
     res,
     "Password reset link sent successfully.",
     null,
-    HTTP_STATUS.OK
+    HTTP_STATUS.OK,
   );
 });
 
@@ -159,5 +176,6 @@ export {
   getMe,
   changePassword,
   resetPassword,
-  forgotPassword
+  forgotPassword,
+  logoutBySessionId,
 };

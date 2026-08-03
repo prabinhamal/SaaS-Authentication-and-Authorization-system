@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { UnAuthorizedError } from "../utils/AppError";
-import { ACCESS_TOKEN_COOKIE } from "../services/token.service";
 import authService from "../services/auth.service";
+import { ACCESS_TOKEN_COOKIE } from "../constants/auth.constants";
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {

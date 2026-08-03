@@ -46,6 +46,10 @@ export interface AuthUser {
   status: AccountStatus;
   avatarUrl?: string;
 }
+export interface UpdateUserInput {
+  userName?: string;
+  avatarUrl?: string;
+}
 
 export interface LoginResult {
   user: UserDocument;

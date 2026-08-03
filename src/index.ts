@@ -1,6 +1,5 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express } from "express";
 import bodyParser from "body-parser";
-import cors from "cors"
 import connectDatabase from "./config/connectDB";
 import { errorMiddleware, notFoundHandler } from "./middleware/error.middleware";
 import config from "./config/config";
@@ -9,23 +8,18 @@ import authRouter from "./routes/auth.route"
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.route"
 import { connectRedis } from "./config/redis.config";
+import corsMiddleware from "./middleware/cors";
 
 
 const app: Express = express();
 
 const PORT: number = Number(config.get("port")) || 3001;
 
-app.use(
-  cors({
-    origin: config.get("frontendOrigin2"),
-    credentials: true,
-  })
-);
+app.use(corsMiddleware);
 
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(cookieParser())
-
 
 
 connectDatabase();
@@ -40,5 +34,3 @@ app.use(errorMiddleware);
 app.listen(PORT, () => {
   console.log(`server are run or http://localhost:${PORT}`);
 });
-
-

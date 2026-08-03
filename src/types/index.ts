@@ -1,84 +1,90 @@
-///
+// ///
 
-import { Response } from "express";
-import { IUser } from "../interfaces/user.interface";
+// import { Response } from "express";
+// import { IUser } from "../interfaces/user.interface";
 
-export type LoginMethod = "password" | "google" | "github";
+// export type LoginMethod = "password" | "google" | "github";
 
-export interface DeviceInfo {
-  id: string;
-  name: string;
+// export interface DeviceInfo {
+//   id: string;
+//   name: string;
 
-  browser: string;
-  browserVersion: string;
+//   browser: string;
+//   browserVersion: string;
 
-  os: string;
-  osVersion: string;
+//   os: string;
+//   osVersion: string;
 
-  ipAddress: string;
-  userAgent: string;
-}
+//   ipAddress: string;
+//   userAgent: string;
+// }
 
-interface SessionBase {
-  userId: string;
-  refreshTokenHash: string;
+// interface SessionBase {
+//   userId: string;
+//   refreshTokenHash: string;
 
-  device: DeviceInfo;
+//   device: DeviceInfo;
 
-  loginMethod: LoginMethod;
-}
+//   loginMethod: LoginMethod;
+// }
 
-export interface CreateSessionInput extends SessionBase {
-  rememberMe: boolean;
-}
+// export interface CreateSessionInput extends SessionBase {
+//   rememberMe: boolean;
+// }
 
-export interface SessionPayload extends SessionBase {
-  createdAt: number;
-  lastSeen: number;
-  expiresAt: number;
-}
+// export interface SessionPayload extends SessionBase {
+//   createdAt: number;
+//   lastSeen: number;
+//   expiresAt: number;
+// }
 
-type TokenType = "access" | "refresh";
+// type TokenType = "access" | "refresh";
 
-export type TokenPayload = {
-  sub: string;
-  sid: string;
-  type: TokenType;
-};
+// export type TokenPayload = {
+//   sub: string;
+//   sid: string;
+//   type: TokenType;
+// };
 
-export type AuthenticatedUser = {
-  userId: string;
-  sessionId: string;
-};
+// export type AuthenticatedUser = {
+//   userId: string;
+//   sessionId: string;
+// };
 
-export type UserSessions = {
-  sessionId: string;
-  session: SessionPayload;
-};
+// export type UserSessions = {
+//   sessionId: string;
+//   session: SessionPayload;
+// };
 
-export type GenerateRefreshTokenResult = {
-  refreshToken: string;
-  hash: string;
-};
+// export type GenerateRefreshTokenResult = {
+//   refreshToken: string;
+//   hash: string;
+// };
 
-export type CookiesInput = {
-  response: Response;
-  accessToken: string;
-  refreshToken: string;
-  deviceId: string;
-  rememberMe?: boolean;
-};
+// export type CookiesInput = {
+//   response: Response;
+//   accessToken: string;
+//   refreshToken: string;
+//   deviceId: string;
+//   rememberMe?: boolean;
+// };
 
-export interface RefreshTokensResult {
-  accessToken: string;
-  refreshToken: string;
-  rememberMe?: boolean;
-  deviceId: string;
-  user: IUser;
-}
+// export interface RefreshTokensResult {
+//   accessToken: string;
+//   refreshToken: string;
+//   rememberMe?: boolean;
+//   deviceId: string;
+//   user: IUser;
+// }
 
-export interface ChangePassInput {
-  accessToken: string,
-  oldPassword: string;
-  newPassword: string;
-}
+// export interface ChangePassInput {
+//   accessToken: string,
+//   oldPassword: string;
+//   newPassword: string;
+// }
+
+
+// export interface UpdateUserInput {
+//   userName?: string;
+//   avatarUrl?: string;
+// }

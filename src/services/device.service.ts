@@ -1,13 +1,8 @@
 
-export interface DeviceRequestInfo {
-  ipAddress: string;
-  userAgent: string;
-  deviceId?: string;
-}
-
 import { UAParser } from "ua-parser-js";
-import { DeviceInfo } from "../types";
+
 import tokenService from "./token.service";
+import { DeviceInfo, DeviceRequestInfo } from "../interfaces";
 
 class DeviceService {
   getDeviceInfo(request: DeviceRequestInfo): DeviceInfo {

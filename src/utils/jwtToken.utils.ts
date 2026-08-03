@@ -1,7 +1,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import config from "../config/config";
-import { AuthProvider, UserRole } from "../constants/user.constants";
-import { TokenPayload } from "../types";
+import { TokenPayload } from "../interfaces";
+
 
 const JWT_ACCESS_SECRET = config.get("jwtAccessSecret");
 const JWT_REFRESH_SECREAT = config.get("jwtRefreshSecret");
