@@ -13,7 +13,18 @@ interface Config {
   emailPass?: string,
   jwtAccessSecret?: string,
   jwtRefreshSecret?: string,
-  redis_url?: string
+  redis_url: string,
+
+  // Google credentials
+  google_client_id: string,
+  google_client_secret: string,
+  google_redirect_uri: string,
+
+    // github credentials
+  github_client_id: string,
+  github_client_secret: string,
+  github_redirect_uri: string,
+  
 }
 
 /// read env file and retrive value
@@ -36,7 +47,15 @@ const _config: Config = {
   emailPass: requireEnv("EMAIL_PASS"),
   jwtAccessSecret: requireEnv("ACCESS_TOKEN_SECRET"),
   jwtRefreshSecret: requireEnv("REFRESH_TOKEN_SECRET"),
-  redis_url: requireEnv("REDIS_URL")
+  redis_url: requireEnv("REDIS_URL"),
+
+  google_client_id: requireEnv("GOOGLE_CLIENT_ID"),
+  google_client_secret: requireEnv("GOOGLE_CLIENT_SECRET"),
+  google_redirect_uri: requireEnv("GOOGLE_REDIRECT_URI"),
+
+  github_client_id: requireEnv("GITHUB_CLIENT_ID"),
+  github_client_secret: requireEnv("GITHUB_CLIENT_SECRET"),
+  github_redirect_uri: requireEnv("GITHUB_REDIRECT_URI")
 };
 
 type ConfigKey = keyof Config;
