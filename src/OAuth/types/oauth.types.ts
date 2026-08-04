@@ -11,3 +11,9 @@ export interface OAuthProvidersConfiguration {
     google: GoogleProviderConfig;
     github: GithubProviderConfig;
 }
+
+
+export interface AuthorizationUrlOptions {};
+export interface ProviderTokenResponse{};
+export interface AuthorizationCodeInput{};
+export interface OAuthIdentity{};
