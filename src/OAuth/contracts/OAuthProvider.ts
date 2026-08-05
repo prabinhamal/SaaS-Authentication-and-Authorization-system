@@ -1,9 +1,10 @@
-import { AuthorizationCodeInput, AuthorizationUrlOptions, OAuthIdentity, ProviderTokenResponse } from "../types/oauth.types";
+import { AuthorizationCodeInput, AuthorizationUrlOptions, OAuthIdentity, OAuthProviderName, ProviderTokenResponse } from "../types/oauth.types";
 
 
 export abstract class OAuthProvider<PConfig, PTokenResponse,PIdentity>{
 
     protected readonly config: PConfig;
+    public abstract readonly providerName: OAuthProviderName;
 
     constructor(configuration: PConfig){
         this.config = configuration

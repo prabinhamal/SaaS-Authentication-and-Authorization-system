@@ -5,6 +5,7 @@ import {
   AuthorizationUrlOptions,
   GoogleProviderConfig,
   OAuthIdentity,
+  OAuthProviderName,
   ProviderTokenResponse,
 } from "../../types/oauth.types";
 import { CodeChallengeMethod } from "google-auth-library";
@@ -14,6 +15,7 @@ import { googleIdentitySchema } from "../schema/identityValidator.schema";
 
 class GoogleOAuth extends OAuthProvider<GoogleProviderConfig,ProviderTokenResponse,OAuthIdentity> {
   protected readonly googleClient: OAuth2Client;
+  public readonly providerName = OAuthProviderName.GOOGLE;
   
   constructor(config: GoogleProviderConfig) {
     super(config);

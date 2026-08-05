@@ -40,8 +40,8 @@ export interface OAuthIdentity {
 }
 
 export enum OAuthProviderName {
-  google = "google",
-  github ="github"
+  GOOGLE = "google",
+  GITHUB ="github"
 }
 
 
