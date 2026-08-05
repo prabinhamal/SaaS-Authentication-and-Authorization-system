@@ -8,12 +8,58 @@ export interface GoogleProviderConfig extends BaseProviderConfiguration {} //// 
 export interface GithubProviderConfig extends BaseProviderConfiguration {} //// if any thing additional we add here.
 
 export interface OAuthProvidersConfiguration {
-    google: GoogleProviderConfig;
-    github: GithubProviderConfig;
+  google: GoogleProviderConfig;
+  github: GithubProviderConfig;
+}
+
+export interface AuthorizationUrlOptions {
+  state: string;
+  codeChallenge: string;
+}
+export interface ProviderTokenResponse {
+  accessToken: string;
+  idToken: string;
+  refreshToken?: string;
+  expiresIn: number;
+  tokenType: string;
+  scope: string;
+}
+export interface AuthorizationCodeInput {
+  code: string;
+  codeVerifier: string;
+}
+
+export interface OAuthIdentity {
+  sub: string;
+  email: string;
+  emailVerified: boolean;
+  name: string;
+  givenName?: string | undefined;
+  familyName?: string | undefined;
+  avatar?: string | undefined;
+}
+
+export enum OAuthProviderName {
+  google = "google",
+  github ="github"
 }
 
 
-export interface AuthorizationUrlOptions {};
-export interface ProviderTokenResponse{};
-export interface AuthorizationCodeInput{};
-export interface OAuthIdentity{};
+export interface OAuthTransaction {
+  provider: OAuthProviderName,
+  state: string;
+  codeVerifier: string;
+  expiresAt: Date;
+}
+
+export interface CreateOAuthTransactionInput {
+  provider: OAuthProviderName;
+  state: string;
+  codeVerifier: string;
+}
+
+export interface OAuthTransactionResult {
+  transactionId: string;
+  state: string;
+  codeVerifier: string;
+}

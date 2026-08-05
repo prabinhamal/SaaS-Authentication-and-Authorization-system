@@ -1,7 +1,7 @@
 import { AuthorizationCodeInput, AuthorizationUrlOptions, OAuthIdentity, ProviderTokenResponse } from "../types/oauth.types";
 
 
-export abstract class OAuthProvider<PConfig>{
+export abstract class OAuthProvider<PConfig, PTokenResponse,PIdentity>{
 
     protected readonly config: PConfig;
 
@@ -9,9 +9,9 @@ export abstract class OAuthProvider<PConfig>{
         this.config = configuration
     }
 
-   abstract generateAuthorizationUrl(options: AuthorizationUrlOptions): Promise<URL>;
-//    abstract exchangeAuthorizationCode(input: AuthorizationCodeInput): Promise<ProviderTokenResponse>;
-//    abstract getUserIdentity(token: ProviderTokenResponse): Promise<OAuthIdentity>;
+   abstract generateAuthorizationUrl(options: AuthorizationUrlOptions): URL;
+   abstract exchangeAuthorizationCode(input: AuthorizationCodeInput): Promise<PTokenResponse>;
+   abstract getUserIdentity(token: PTokenResponse): Promise<PIdentity>;
 
 //    abstract normalizeResult(): void;
 
