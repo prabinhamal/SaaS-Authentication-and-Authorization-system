@@ -27,7 +27,9 @@
   },
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
+    "arctic": "^3.7.0",
     "argon2": "^0.44.0",
+    "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
     "cookie-parser": "^1.4.7",
