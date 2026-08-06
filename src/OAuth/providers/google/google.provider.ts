@@ -10,13 +10,16 @@ import {
 } from "../../types/oauth.types";
 import { CodeChallengeMethod } from "google-auth-library";
 import { OAuth2Client } from "google-auth-library";
-import { googleProviderTokenSchema } from "../schema/tokenValidator.schema";
+import { googleProviderTokenSchema } from "../schema/token.schema";
 import { googleIdentitySchema } from "../schema/identityValidator.schema";
 
-class GoogleOAuth extends OAuthProvider<GoogleProviderConfig,ProviderTokenResponse,OAuthIdentity> {
+export class GoogleOAuth extends OAuthProvider<
+  GoogleProviderConfig,
+  ProviderTokenResponse
+> {
   protected readonly googleClient: OAuth2Client;
   public readonly providerName = OAuthProviderName.GOOGLE;
-  
+
   constructor(config: GoogleProviderConfig) {
     super(config);
     this.googleClient = new OAuth2Client(
@@ -35,8 +38,16 @@ class GoogleOAuth extends OAuthProvider<GoogleProviderConfig,ProviderTokenRespon
     });
     return new URL(url);
   }
-  async exchangeAuthorizationCode( input: AuthorizationCodeInput): Promise<ProviderTokenResponse> {
-    const { tokens } = await this.googleClient.getToken(input.code);
+  async exchangeAuthorizationCode(
+    input: AuthorizationCodeInput,
+  ): Promise<ProviderTokenResponse> {
+    const { tokens } = await this.googleClient.getToken({
+      code: input.code,
+      codeVerifier: input.codeVerifier,
+    });
+
+    // console.log(tokens);
+
     const result = googleProviderTokenSchema.safeParse(tokens);
     if (!result.success)
       throw new UnAuthorizedError("Invalid code or token response.");
@@ -45,11 +56,15 @@ class GoogleOAuth extends OAuthProvider<GoogleProviderConfig,ProviderTokenRespon
       : 0;
     return {
       accessToken: result.data.access_token,
-      refreshToken: result.data.refresh_token,
       idToken: result.data.id_token,
       expiresIn,
       tokenType: result.data.token_type,
-      scope: result.data.scope,
+      ...(result.data.refresh_token && {
+        refreshToken: result.data.refresh_token,
+      }),
+      ...(result.data.scope && {
+        scope: result.data.scope,
+      }),
     };
   }
 

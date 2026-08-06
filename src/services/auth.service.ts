@@ -1,8 +1,4 @@
-import {
-  AuthUser,
-  IUser,
-  LoginResult,
-} from "../interfaces/user.interface";
+import { AuthUser, IUser, LoginResult } from "../interfaces/user.interface";
 import { HydratedDocument } from "mongoose";
 import crypto from "crypto";
 import UserModel from "../models/User.model";
@@ -22,13 +18,23 @@ import {
 import deviceService from "./device.service";
 import sessionService from "./session.service";
 import tokenService from "./token.service";
-import { hashToken, randomBytes } from "../utils/CryptoRandom";
+import { hashToken, randomBytes } from "../utils/crypto.utils";
 import userService from "./user.service";
 import TokenModel, { TokenOtpType } from "../models/VerificationToken.model";
 import { passwordResetEmailTemplate } from "../messaging/templates/resetPassword.template";
 import { emailProvider } from "../messaging/emails/email.service";
 import { EmailProviderType } from "../interfaces/email.interface";
-import { ChangePasswordInput, DeviceRequestInfo, RefreshTokensResult } from "../interfaces";
+import {
+  ChangePasswordInput,
+  DeviceRequestInfo,
+  RefreshTokensResult,
+} from "../interfaces";
+import { OAuthIdentity, OAuthProviderName } from "../OAuth/types/oauth.types";
+import {
+  createAuthSession,
+  createOAuthUserData,
+  linkOAuthProvider,
+} from "../utils/oauth.utils";
 
 class authService {
   async register(data: RegisterUserInput): Promise<HydratedDocument<IUser>> {
@@ -301,6 +307,41 @@ class authService {
 
     //// revoke all session
     await sessionService.revokeAllUserSessions(session.userId);
+  }
+
+  async loginWithOAuth(
+    identity: OAuthIdentity,
+    provider: OAuthProviderName,
+    requestInfo: DeviceRequestInfo,
+  ): Promise<LoginResult> {
+    /// checked if user is alrady exist with this email or not
+    let user = await userService.getUserByProviderId(provider, identity.sub);
+
+    if (!user) {
+      const existingUser = await UserModel.findOne({ email: identity.email }); ///await userService.getUserByEmail(identity.email);
+
+      if (existingUser) {
+        user = await linkOAuthProvider(
+          existingUser._id.toString(),
+          provider,
+          identity.sub,
+        );
+      } else {
+        user = await UserModel.create(
+          createOAuthUserData({
+            provider,
+            identity,
+          }),
+        );
+      }
+    }
+
+    return createAuthSession({
+      user,
+      requestInfo,
+      rememberMe: true,
+      loginMethod: provider,
+    });
   }
 }
 

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 type AsyncHandler = (
   req: Request,
   res: Response,
-) => Promise<Response>;
+) => Promise<Response | void>;
 
 export const asyncHandler =
    (handler: AsyncHandler) =>

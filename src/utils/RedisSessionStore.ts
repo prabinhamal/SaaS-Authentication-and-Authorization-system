@@ -1,7 +1,10 @@
 import { redisClient } from "../config/redis.config";
 import { SessionPayload } from "../interfaces";
-import { oauthTransactionSchema } from "../OAuth/providers/schema/tokenValidator.schema";
-import { CreateOAuthTransactionInput, OAuthTransactionResult } from "../OAuth/types/oauth.types";
+import { oauthTransactionSchema } from "../OAuth/providers/schema/token.schema";
+import {
+  CreateOAuthTransactionInput,
+  OAuthTransactionResult,
+} from "../OAuth/types/oauth.types";
 import { UnAuthorizedError } from "./AppError";
 
 export const getSessionKey = (sessionId: string) => `session:${sessionId}`;
@@ -35,14 +38,17 @@ export const storeSession = async (
     .exec();
 };
 
-export const getOAuthTransactionKey = (tId: string) => `oauth:transaction${tId}`;
+export const getOAuthTransactionKey = (tId: string) =>
+  `oauth:transaction:${tId}`;
 
 export const storeOAuthTransaction = async (
   tId: string,
   data: CreateOAuthTransactionInput,
 ): Promise<OAuthTransactionResult> => {
   const tKey = getOAuthTransactionKey(tId);
-  const OAUTH_TRANSACTION_TTL = 5 * 60 ; /// expired in 5 minutes.
+  const OAUTH_TRANSACTION_TTL = 5 * 60; /// expired in 5 minutes.
+
+  // console.log("store transaction. ")
 
   await redisClient
     .multi()
@@ -56,7 +62,7 @@ export const storeOAuthTransaction = async (
   return {
     transactionId: tId,
     state: data.state,
-    codeVerifier: data.codeVerifier
+    codeVerifier: data.codeVerifier,
   };
 };
 
@@ -64,14 +70,15 @@ export const getOAuthTransaction = async (
   tId: string,
 ): Promise<CreateOAuthTransactionInput> => {
   const tKey = getOAuthTransactionKey(tId);
-const transaction = await redisClient.hGetAll(tKey);
+  const transaction = await redisClient.hGetAll(tKey);
 
   if (!Object.keys(transaction).length)
     throw new UnAuthorizedError("Invalid or Expired OAuth request.");
 
   const result = oauthTransactionSchema.safeParse(transaction);
 
-if(!result.success) throw new UnAuthorizedError("Invalid OAuth transaction.")
+  if (!result.success)
+    throw new UnAuthorizedError("Invalid OAuth transaction.");
 
   return {
     provider: result.data.provider,

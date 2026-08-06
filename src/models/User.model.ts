@@ -40,13 +40,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
         type: String,
         unique: true,
         sparse: true,
-        default: null,
       },
       githubId: {
         type: String,
         unique: true,
         sparse: true,
-        default: null,
       },
     },
 

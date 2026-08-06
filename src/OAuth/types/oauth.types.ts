@@ -22,7 +22,7 @@ export interface ProviderTokenResponse {
   refreshToken?: string;
   expiresIn: number;
   tokenType: string;
-  scope: string;
+  scope?: string;
 }
 export interface AuthorizationCodeInput {
   code: string;
@@ -62,4 +62,11 @@ export interface OAuthTransactionResult {
   transactionId: string;
   state: string;
   codeVerifier: string;
+}
+
+
+export interface OAuthCallbackData {
+  code: string;
+  state: string;
+  transactionId: string;
 }

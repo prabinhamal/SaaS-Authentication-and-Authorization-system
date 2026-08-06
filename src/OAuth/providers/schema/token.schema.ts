@@ -4,10 +4,10 @@ import { OAuthProviderName } from "../../types/oauth.types";
 export const googleProviderTokenSchema = z.object({
   access_token: z.string().min(1, "Access token is required"),
   id_token: z.string().min(1, "ID token is required"),
-  refresh_token: z.string(),
+  refresh_token: z.string().nullable().optional(),
   expiry_date: z.number().int().positive(),
   token_type: z.string().min(1, "Token type is required"),
-  scope: z.string().min(1, "Scope is required"),
+  scope: z.string().min(1, "Scope is required").optional(),
 });
 
 export type GoogleProviderToken = z.infer<typeof googleProviderTokenSchema>;

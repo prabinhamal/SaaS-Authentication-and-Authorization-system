@@ -8,7 +8,7 @@ import { tokenSchema } from "../lib/schemas/Token.schema";
 import type { CookieOptions, Request, Response } from "express";
 
 import { UnAuthorizedError } from "../utils/AppError";
-import { hashToken, randomBytes } from "../utils/CryptoRandom";
+import { hashToken, randomBytes } from "../utils/crypto.utils";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -16,15 +16,21 @@ import {
   verifyRefreshToken,
 } from "../utils/jwtToken.utils";
 import { CookiesInput } from "../interfaces";
-import { ACCESS_TOKEN_COOKIE, DEVICE_ID_COOKIE, REFRESH_TOKEN_COOKIE, REFRESH_TOKEN_TTL, REMEMBER_ME_REFRESH_TOKEN_TTL } from "../constants/auth.constants";
+import {
+  ACCESS_TOKEN_COOKIE,
+  DEVICE_ID_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  REFRESH_TOKEN_TTL,
+  REMEMBER_ME_REFRESH_TOKEN_TTL,
+} from "../constants/auth.constants";
 
 class TokenService {
- private cookieOptions(timestamp: number): CookieOptions {
+  private cookieOptions(timestamp: number): CookieOptions {
     return {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: timestamp
+      maxAge: timestamp,
     };
   }
 
@@ -82,28 +88,41 @@ class TokenService {
 
   /// setup all cookies
   setAuthCookies(input: CookiesInput): void {
-    const refreshTokenMaxAge = input.rememberMe ? REMEMBER_ME_REFRESH_TOKEN_TTL: REFRESH_TOKEN_TTL
+    const refreshTokenMaxAge = input.rememberMe
+      ? REMEMBER_ME_REFRESH_TOKEN_TTL
+      : REFRESH_TOKEN_TTL;
     /// Set Cookies
-    input.response.cookie(ACCESS_TOKEN_COOKIE, input.accessToken, this.cookieOptions(15*60*1000));
-    input.response.cookie(REFRESH_TOKEN_COOKIE, input.refreshToken, this.cookieOptions(refreshTokenMaxAge));
-    input.response.cookie(DEVICE_ID_COOKIE, input.deviceId, this.cookieOptions( 365 * 24 * 60 * 60 * 1000));
+    input.response.cookie(
+      ACCESS_TOKEN_COOKIE,
+      input.accessToken,
+      this.cookieOptions(15 * 60 * 1000),
+    );
+    input.response.cookie(
+      REFRESH_TOKEN_COOKIE,
+      input.refreshToken,
+      this.cookieOptions(refreshTokenMaxAge),
+    );
+    input.response.cookie(
+      DEVICE_ID_COOKIE,
+      input.deviceId,
+      this.cookieOptions(365 * 24 * 60 * 60 * 1000),
+    );
   }
 
-  clearAuthCookies(response: Response): void{
-    const cookieAttribute= this.cookieOptions(0)
+  clearAuthCookies(response: Response): void {
+    const cookieAttribute = this.cookieOptions(0);
     /// clear cookies
-    response.clearCookie(ACCESS_TOKEN_COOKIE,cookieAttribute);
-    response.clearCookie(REFRESH_TOKEN_COOKIE,cookieAttribute);
+    response.clearCookie(ACCESS_TOKEN_COOKIE, cookieAttribute);
+    response.clearCookie(REFRESH_TOKEN_COOKIE, cookieAttribute);
     response.clearCookie(DEVICE_ID_COOKIE, cookieAttribute);
   }
 
-  generateDeviceId(): string{
-    return randomBytes(32)
+  generateDeviceId(): string {
+    return randomBytes(32);
   }
 
-  getDeviceId(request: Request): string{
-    return request.cookies[DEVICE_ID_COOKIE] ?? this.generateDeviceId()
+  getDeviceId(request: Request): string {
+    return request.cookies[DEVICE_ID_COOKIE] ?? this.generateDeviceId();
   }
-
 }
 export default new TokenService();

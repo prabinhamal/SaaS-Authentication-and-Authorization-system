@@ -1,12 +1,19 @@
 import { redisClient } from "../config/redis.config";
-import { REFRESH_TOKEN_TTL, REMEMBER_ME_REFRESH_TOKEN_TTL } from "../constants/auth.constants";
-import { CreateSessionInput, LoginMethod, SessionPayload, UserSession } from "../interfaces";
+import {
+  REFRESH_TOKEN_TTL,
+  REMEMBER_ME_REFRESH_TOKEN_TTL,
+} from "../constants/auth.constants";
+import {
+  CreateSessionInput,
+  LoginMethod,
+  SessionPayload,
+  UserSession,
+} from "../interfaces";
 import { redisSessionSchema } from "../lib/schemas/Session.schema";
 
 import { ForbiddenError, UnAuthorizedError } from "../utils/AppError";
-import { randomBytes } from "../utils/CryptoRandom";
+import { randomBytes } from "../utils/crypto.utils";
 import { getSessionKey, storeSession } from "../utils/RedisSessionStore";
-
 
 class SessionService {
   generateSessionId(): string {
@@ -147,12 +154,12 @@ class SessionService {
     }
   }
 
-  async revokeDeviceSession(userId: string, sessionId: string): Promise<void>{
-    const session = await this.getSession(sessionId)
-    if(session?.userId !== userId) throw new ForbiddenError("You are not allowed to revoke this session!.")
-    await this.revokeSession(sessionId)
+  async revokeDeviceSession(userId: string, sessionId: string): Promise<void> {
+    const session = await this.getSession(sessionId);
+    if (session?.userId !== userId)
+      throw new ForbiddenError("You are not allowed to revoke this session!.");
+    await this.revokeSession(sessionId);
   }
-
 }
 
 export default new SessionService();

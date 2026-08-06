@@ -10,5 +10,21 @@ export const hashToken = (token: string): string => {
 };
 
 export const randomBase64Url = (bytes: number): string => {
-  return crypto.randomBytes(bytes).toBase64({ alphabet: "base64url" });
+  return crypto.randomBytes(bytes).toString("base64url");
 };
+
+
+export const generateCodeChallenge = (codeVerifier: string): string => {
+  return crypto
+    .createHash("sha256")
+    .update(codeVerifier)
+    .digest("base64url");
+};
+
+
+
+
+
+
+
+
