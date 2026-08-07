@@ -15,7 +15,6 @@ import {
   AuthProvider,
   UserRole,
 } from "../constants/user.constants";
-import deviceService from "./device.service";
 import sessionService from "./session.service";
 import tokenService from "./token.service";
 import { hashToken, randomBytes } from "../utils/crypto.utils";
@@ -31,10 +30,10 @@ import {
 } from "../interfaces";
 import { OAuthIdentity, OAuthProviderName } from "../OAuth/types/oauth.types";
 import {
-  createAuthSession,
   createOAuthUserData,
   linkOAuthProvider,
 } from "../utils/oauth.utils";
+import { createAuthSession } from "../utils/auth.utils";
 
 class authService {
   async register(data: RegisterUserInput): Promise<HydratedDocument<IUser>> {
@@ -80,38 +79,12 @@ class authService {
 
     if (user.status !== AccountStatus.ACTIVE)
       throw new UnAuthorizedError("Accoun is not active.");
-
-    const device = deviceService.getDeviceInfo(requestInfo);
-
-    const sessionId = sessionService.generateSessionId();
-
-    const refresh = tokenService.generateRefreshToken({
-      userId: user._id.toString(),
-      sessionId,
-    });
-
-    await sessionService.createSession(
-      {
-        userId: user._id.toString(),
-        refreshTokenHash: refresh.hash,
-        device,
-        rememberMe: data.remamberMe ?? false,
-        loginMethod: "password",
-      },
-      sessionId,
-    );
-
-    const accessToken = tokenService.generateAccessToken({
-      userId: user._id.toString(),
-      sessionId,
-    });
-
-    return {
+    return createAuthSession({
       user,
-      accessToken,
-      refreshToken: refresh.refreshToken,
-      deviceId: device.id,
-    };
+      requestInfo,
+      rememberMe: data.remamberMe ?? false,
+      loginMethod: "password",
+    });
   }
 
   async forgotPassword(email: string): Promise<void> {

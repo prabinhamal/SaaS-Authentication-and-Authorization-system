@@ -18,11 +18,6 @@ export const generateRefreshToken = (payload: TokenPayload) =>
     algorithm: "HS256",
     expiresIn: "7d",
   });
-/**
- *
- * @param token => set in user browser cookies
- * @returns => if valid then return payload
- */
 
 export const verifyAccessToken = (token: string): string | JwtPayload => {
   return jwt.verify(token, JWT_ACCESS_SECRET);

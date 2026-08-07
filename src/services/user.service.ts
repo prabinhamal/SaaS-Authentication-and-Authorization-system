@@ -1,10 +1,11 @@
 import UserModel from "../models/User.model";
 import { IUser, UpdateUserInput, UserDocument } from "../interfaces/user.interface";
-import { AppError, NotFoundError } from "../utils/AppError";
+import { NotFoundError } from "../utils/AppError";
 
 import { AccountStatus } from "../constants/user.constants";
 import sessionService from "./session.service";
 import { OAuthProviderName } from "../OAuth/types/oauth.types";
+import { getProviderConfig } from "../utils/oauth.utils";
 
 class UserServices {
   async getUserById(id: string): Promise<IUser> {
@@ -52,25 +53,15 @@ class UserServices {
     await sessionService.revokeAllUserSessions(userId);
   }
 
-/// For OAuth only.
+/// For OAuth only
 async getUserByProviderId(
   provider: OAuthProviderName,
   providerId: string,
 ): Promise<UserDocument | null> {
-  switch (provider) {
-    case OAuthProviderName.GOOGLE:
-      return UserModel.findOne({
-        "providers.googleId": providerId,
-      });
-
-    case OAuthProviderName.GITHUB:
-      return UserModel.findOne({
-        "providers.githubId": providerId,
-      });
-
-    default:
-      throw new AppError("Unsupported OAuth provider.");
-  }
+  const {field} = getProviderConfig(provider); /// get field name base on provider.
+  return UserModel.findOne({
+    [`providers.${field}`]: providerId,
+  })
 }
 
 }

@@ -1,11 +1,13 @@
+import { GithubProviderConfig } from "../providers/github/github.type";
+import { GoogleProviderConfig } from "../providers/google/google.type";
+
 export interface BaseProviderConfiguration {
   clientId: string;
   clientSecret: string;
   redirectUri: string;
+  scopes: string[]
 }
 
-export interface GoogleProviderConfig extends BaseProviderConfiguration {} //// if any thing additional we add here.
-export interface GithubProviderConfig extends BaseProviderConfiguration {} //// if any thing additional we add here.
 
 export interface OAuthProvidersConfiguration {
   google: GoogleProviderConfig;
@@ -16,14 +18,7 @@ export interface AuthorizationUrlOptions {
   state: string;
   codeChallenge: string;
 }
-export interface ProviderTokenResponse {
-  accessToken: string;
-  idToken: string;
-  refreshToken?: string;
-  expiresIn: number;
-  tokenType: string;
-  scope?: string;
-}
+
 export interface AuthorizationCodeInput {
   code: string;
   codeVerifier: string;

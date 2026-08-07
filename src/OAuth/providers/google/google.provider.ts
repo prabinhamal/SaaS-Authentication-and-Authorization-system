@@ -3,15 +3,14 @@ import { OAuthProvider } from "../../contracts/OAuthProvider";
 import {
   AuthorizationCodeInput,
   AuthorizationUrlOptions,
-  GoogleProviderConfig,
   OAuthIdentity,
   OAuthProviderName,
-  ProviderTokenResponse,
 } from "../../types/oauth.types";
 import { CodeChallengeMethod } from "google-auth-library";
 import { OAuth2Client } from "google-auth-library";
 import { googleProviderTokenSchema } from "../schema/token.schema";
 import { googleIdentitySchema } from "../schema/identityValidator.schema";
+import { GoogleProviderConfig, ProviderTokenResponse } from "./google.type";
 
 export class GoogleOAuth extends OAuthProvider<
   GoogleProviderConfig,
@@ -30,10 +29,10 @@ export class GoogleOAuth extends OAuthProvider<
   }
   generateAuthorizationUrl(options: AuthorizationUrlOptions): URL {
     const url = this.googleClient.generateAuthUrl({
-      access_type: "offline",
+      access_type: this.config.accessType,
       state: options.state,
       code_challenge: options.codeChallenge,
-      scope: ["openid", "email", "profile"],
+      scope: this.config.scopes,
       code_challenge_method: CodeChallengeMethod.S256,
     });
     return new URL(url);

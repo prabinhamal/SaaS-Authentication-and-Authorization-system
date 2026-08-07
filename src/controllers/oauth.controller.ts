@@ -7,6 +7,7 @@ import tokenService from "../services/token.service";
 import { ResponseSend } from "../utils/response";
 import { HTTP_STATUS } from "../constants/app.constant";
 import { DEVICE_ID_COOKIE, OAUTH_TRANSACTION_COOKIE } from "../constants/auth.constants";
+import config from "../config/config";
 
 
 class OAuthController {
@@ -17,7 +18,7 @@ class OAuthController {
 
     res.cookie(OAUTH_TRANSACTION_COOKIE, result.transactionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.get("nodeEnv") === "production",
       sameSite: "lax",
       path: "/",
     });

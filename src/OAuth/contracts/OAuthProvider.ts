@@ -1,4 +1,4 @@
-import { AuthorizationCodeInput, AuthorizationUrlOptions, OAuthIdentity, OAuthProviderName, ProviderTokenResponse } from "../types/oauth.types";
+import { AuthorizationCodeInput, AuthorizationUrlOptions, OAuthIdentity, OAuthProviderName } from "../types/oauth.types";
 
 
 export abstract class OAuthProvider<PConfig, PTokenResponse>{

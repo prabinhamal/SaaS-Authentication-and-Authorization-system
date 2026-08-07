@@ -6,6 +6,7 @@ dotenv.config();
 interface Config {
   port: string;
   mongoDBURL: string;
+  nodeEnv: string;
   frontendOrigin1?: string;
   frontendOrigin2?: string;
   resendApi?: string,
@@ -19,11 +20,14 @@ interface Config {
   google_client_id: string,
   google_client_secret: string,
   google_redirect_uri: string,
+  google_scopes: string,
+  google_access_type: string,
 
     // github credentials
   github_client_id: string,
   github_client_secret: string,
   github_redirect_uri: string,
+  github_scopes: string,
   
 }
 
@@ -37,9 +41,10 @@ function requireEnv(key: string): string {
 }
 
 /// set all env variable
-const _config: Config = {
+const _config: Config = Object.freeze({
   port: requireEnv("PORT"),
   mongoDBURL: requireEnv("MONGODB_URI"),
+  nodeEnv: requireEnv("NODE_ENV"),
   frontendOrigin1: requireEnv("FRONTEND_ORIGIN_1"),
   frontendOrigin2: requireEnv("FRONTEND_ORIGIN_2"),
   resendApi: requireEnv("RESEND_API_KEY"),
@@ -55,8 +60,11 @@ const _config: Config = {
 
   github_client_id: requireEnv("GITHUB_CLIENT_ID"),
   github_client_secret: requireEnv("GITHUB_CLIENT_SECRET"),
-  github_redirect_uri: requireEnv("GITHUB_REDIRECT_URI")
-};
+  github_redirect_uri: requireEnv("GITHUB_REDIRECT_URI"),
+  github_scopes: requireEnv("GITHUB_OAUTH_SCOPES"),
+  google_scopes: requireEnv("GOOGLE_OAUTH_SCOPES"),
+  google_access_type: requireEnv("GOOGLE_ACCESS_TYPE"),
+});
 
 type ConfigKey = keyof Config;
 

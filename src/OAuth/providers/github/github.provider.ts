@@ -2,17 +2,18 @@ import { OAuthProvider } from "../../contracts/OAuthProvider";
 import {
   AuthorizationCodeInput,
   AuthorizationUrlOptions,
-  GithubProviderConfig,
   OAuthIdentity,
   OAuthProviderName,
-  ProviderTokenResponse,
 } from "../../types/oauth.types";
 
-import { GitHub, generateCodeVerifier } from "arctic";
-import { GithubTokenResponse } from "./github.type";
+import { GitHub } from "arctic";
+import { GithubProviderConfig, GithubTokenResponse } from "./github.type";
 import { UnAuthorizedError } from "../../../utils/AppError";
 import axios from "axios";
-import { githubEmailsSchema, githubProfileSchema } from "./github.schema";
+import { githubEmailsSchema, githubProfileSchema } from "../schema/identityValidator.schema";
+
+const GITHUB_USER_ENDPOINT = "https://api.github.com/user";
+const GITHUB_EMAILS_ENDPOINT = "https://api.github.com/user/emails";
 
 export class GithubOAuth extends OAuthProvider<
   GithubProviderConfig,
@@ -31,10 +32,10 @@ export class GithubOAuth extends OAuthProvider<
   }
 
   generateAuthorizationUrl(options: AuthorizationUrlOptions): URL {
-    const scopes = ["user:email"];
+
     const authorizationUrl = this.githubClient.createAuthorizationURL(
       options.state,
-      scopes,
+      this.config.scopes,
     );
     return authorizationUrl;
   }
@@ -49,7 +50,7 @@ export class GithubOAuth extends OAuthProvider<
 
     if (!accessToken)
       throw new UnAuthorizedError("Invalid authorization code!");
-    
+
     return { accessToken };
   }
 
@@ -66,8 +67,8 @@ async getUserIdentity(
 
  //// retrieve user profile and email information from GitHub
   const [userResponse, emailResponse] = await Promise.all([
-    axios.get("https://api.github.com/user", { headers }),
-    axios.get("https://api.github.com/user/emails", { headers }),
+    axios.get(GITHUB_USER_ENDPOINT, { headers }),
+    axios.get(GITHUB_EMAILS_ENDPOINT, { headers }),
   ]);
 
 ///// validate GitHub profile response

@@ -23,12 +23,13 @@ import {
   REFRESH_TOKEN_TTL,
   REMEMBER_ME_REFRESH_TOKEN_TTL,
 } from "../constants/auth.constants";
+import config from "../config/config";
 
 class TokenService {
   private cookieOptions(timestamp: number): CookieOptions {
     return {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: config.get("nodeEnv") === "production",
       sameSite: "lax",
       maxAge: timestamp,
     };
