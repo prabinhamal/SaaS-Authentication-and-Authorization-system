@@ -28,6 +28,8 @@ interface Config {
   github_client_secret: string,
   github_redirect_uri: string,
   github_scopes: string,
+
+  aes_256_secret: string,
   
 }
 
@@ -64,6 +66,8 @@ const _config: Config = Object.freeze({
   github_scopes: requireEnv("GITHUB_OAUTH_SCOPES"),
   google_scopes: requireEnv("GOOGLE_OAUTH_SCOPES"),
   google_access_type: requireEnv("GOOGLE_ACCESS_TYPE"),
+
+  aes_256_secret: requireEnv("AES_256_SECRET"),
 });
 
 type ConfigKey = keyof Config;
