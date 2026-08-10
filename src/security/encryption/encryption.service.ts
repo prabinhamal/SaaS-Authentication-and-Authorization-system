@@ -1,4 +1,6 @@
+import { AppError } from "../../utils/AppError";
 import { AES256GCMCrypto } from "../crypto/aes256-gcm.crypto";
+import encryptionConfig from "./encryption.config";
 import { EncryptedValue, EncryptionConfig } from "./encryption.types";
 
 export abstract class EncryptionProvider {
@@ -50,6 +52,10 @@ export class EncryptionService extends EncryptionProvider {
     const iv = this.hexToBuffer(value.iv);
     const authTag = this.hexToBuffer(value.authTag);
 
-    return this.aes256GCMCrypto.decrypt({ key, ciphertext, iv, authTag });
+    try {
+        return this.aes256GCMCrypto.decrypt({ key, ciphertext, iv, authTag });
+    } catch (error) {
+          throw new AppError("Decryption failed");
+    }
   }
 }
