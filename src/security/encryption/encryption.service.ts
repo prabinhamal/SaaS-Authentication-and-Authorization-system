@@ -1,6 +1,5 @@
 import { AppError } from "../../utils/AppError";
 import { AES256GCMCrypto } from "../crypto/aes256-gcm.crypto";
-import encryptionConfig from "./encryption.config";
 import { EncryptedValue, EncryptionConfig } from "./encryption.types";
 
 export abstract class EncryptionProvider {

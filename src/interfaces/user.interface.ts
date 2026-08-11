@@ -4,6 +4,7 @@ import {
   AuthProvider,
   UserRole,
 } from "../constants/user.constants";
+import { EncryptedValue } from "../security/encryption/encryption.types";
 
 interface IProviders {
   googleId?: string;
@@ -22,6 +23,8 @@ export interface IUser {
   authProvider: AuthProvider[];
 
   role: UserRole;
+
+  mfa?: IMFA,
 
   providers?: IProviders;
 
@@ -56,4 +59,21 @@ export interface LoginResult {
   accessToken: string;
   refreshToken: string;
   deviceId: string;
+}
+
+export interface IMFA {
+  enabled: boolean;
+  totp: {
+    enabled: boolean;
+    encryptionSecret?: EncryptedValue;
+  };
+  sms: {
+    enabled: boolean;
+  };
+  email: {
+    enabled: boolean;
+  };
+  webAuthn: {
+    enabled: boolean;
+  };
 }

@@ -1,11 +1,60 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import bcrypt from "bcrypt";
-import { IUser } from "../interfaces/user.interface";
+import { IMFA, IUser } from "../interfaces/user.interface";
 import {
   AccountStatus,
   AuthProvider,
   UserRole,
 } from "../constants/user.constants";
+
+const mfaSchema: Schema<IMFA> = new mongoose.Schema<IMFA>(
+  {
+    enabled: {
+      type: Boolean,
+      default: false,
+    },
+    totp: {
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+      encryptionSecret: {
+        version: {
+          type: Number,
+          required: true,
+        },
+
+        algorithm: {
+          type: String,
+          required: true,
+        },
+
+        keyVersion: {
+          type: Number,
+          required: true,
+        },
+
+        iv: {
+          type: String,
+          required: true,
+        },
+
+        ciphertext: {
+          type: String,
+          required: true,
+        },
+
+        authTag: {
+          type: String,
+          required: true,
+        },
+      },
+    },
+  },
+  {
+    _id: false,
+  },
+);
 
 const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
   {
@@ -27,7 +76,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
     password: {
       type: String,
       default: null,
-      select: false
+      select: false,
     },
 
     isEmailVerified: {
@@ -66,6 +115,8 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
       default: AccountStatus.ACTIVE,
     },
 
+    mfa: mfaSchema,
+
     avatarUrl: String,
 
     deletedAt: {
@@ -75,8 +126,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema<IUser>(
 
     lastLoginAt: {
       type: Date,
-    }
-
+    },
   },
   { timestamps: true },
 );

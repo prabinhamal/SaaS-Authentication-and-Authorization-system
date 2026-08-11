@@ -1,5 +1,5 @@
 import UserModel from "../models/User.model";
-import { IUser, UpdateUserInput, UserDocument } from "../interfaces/user.interface";
+import { IMFA, IUser, UpdateUserInput, UserDocument } from "../interfaces/user.interface";
 import { NotFoundError } from "../utils/AppError";
 
 import { AccountStatus } from "../constants/user.constants";
@@ -62,6 +62,25 @@ async getUserByProviderId(
   return UserModel.findOne({
     [`providers.${field}`]: providerId,
   })
+}
+
+/// for spacefic mfa 
+
+async updateMFA(
+  userId: string,
+  update: Partial<IMFA>,
+): Promise<void> {
+  await UserModel.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        mfa: update,
+      },
+    },
+    {
+      runValidators: true,
+    },
+  );
 }
 
 }

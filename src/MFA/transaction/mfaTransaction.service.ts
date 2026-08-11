@@ -6,7 +6,7 @@ import {
 } from "./mfaTransaction.store";
 import { MFAChallenge } from "./mfaTransaction.types";
 
-class MFATransactionService {
+export class MFATransactionService {
   async createChallenge(userId: string): Promise<MFAChallenge> {
     const challengeId = randomBytes(16); // helper returns a cryptographically secure hex string
 
