@@ -12,6 +12,7 @@ import {
 } from "./totp.types";
 import { MFATransactionService } from "../../transaction/mfaTransaction.service";
 import { BadRequestError } from "../../../utils/AppError";
+import { MFAMethodName } from "../../types/mfa.types";
 
 export class TOTPMethods extends MFAMethod<
   MFAConfig,
@@ -21,6 +22,9 @@ export class TOTPMethods extends MFAMethod<
   TOTPVerificationInput,
   TOTPVerificationResult
 > {
+
+  public readonly methodName = MFAMethodName.TOTP;
+
   constructor(
     configuration: MFAConfig,
     private readonly mfaRepository: MFARepository,

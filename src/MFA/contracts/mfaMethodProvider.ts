@@ -1,4 +1,6 @@
 
+import { IMFAProvider, MFAMethodName } from "../types/mfa.types";
+
 
 export abstract class MFAMethod<
   Config,
@@ -7,9 +9,9 @@ export abstract class MFAMethod<
   EnrollmentVerificationResult,
   VerificationInput,
   VerificationResult,
-> {
+> implements IMFAProvider {
   protected readonly config: Config;
-
+  abstract readonly methodName: MFAMethodName;
   constructor(config: Config) {
     this.config = config;
   }
