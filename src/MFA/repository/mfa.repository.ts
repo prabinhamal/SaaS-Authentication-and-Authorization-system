@@ -33,9 +33,7 @@ export class MFARepository {
 
   async getEnabledTOTPSecret(userId: string): Promise<string> {
     const { enabled, secret } = await this.getTOTPSecret(userId);
-    if (!enabled) {
-      throw new BadRequestError("TOTP MFA is not enabled.");
-    }
+    if (!enabled) throw new BadRequestError("TOTP MFA is not enabled.");
     return secret;
   }
 
@@ -63,4 +61,82 @@ export class MFARepository {
       totp,
     });
   }
+
+
+///// webAuthn methods
+
+  async addWebAuthnCredential(userId: string,credential: IMFA["webAuthn"]["credentials"][number]): Promise<void> {
+    const user = await userService.getUserById(userId);
+    const webAuthn = user.mfa?.webAuthn;
+
+    if (!webAuthn) {
+      throw new BadRequestError("WebAuthn MFA is not configured.");
+    }
+    const credentials = [...(webAuthn.credentials ?? []),credential];
+
+    await userService.updateMFA(userId, {
+      webAuthn: {
+        enabled: webAuthn.enabled,
+        credentials,
+      },
+    });
+  }
+
+  async getWebAuthnCredential( userId: string, credentialId: string): Promise<IMFA["webAuthn"]["credentials"][number]> {
+    const user = await userService.getUserById(userId);
+
+    const credential =user.mfa?.webAuthn?.credentials.find((credential) => credential.credentialId === credentialId);
+
+    if (!credential) 
+      throw new BadRequestError("WebAuthn credential not found.");
+    return credential;
+  }
+
+  async getWebAuthnCredentials(userId: string): Promise<IMFA["webAuthn"]["credentials"]> {
+    const user = await userService.getUserById(userId);
+    return user.mfa?.webAuthn?.credentials ?? [];
+  }
+
+  async updateWebAuthnCredentialCounter(userId: string,credentialId: string,counter: number ): Promise<void> {
+    const user = await userService.getUserById(userId);
+
+    const webAuthn = user.mfa?.webAuthn;
+    if (!webAuthn) throw new BadRequestError("WebAuthn MFA is not configured.");
+    
+
+    const credentials =
+      webAuthn.credentials.map((credential) =>
+        credential.credentialId === credentialId
+          ? {
+              ...credential,
+              counter,
+            }
+          : credential,
+      );
+
+    await userService.updateMFA(userId, {
+      webAuthn: {
+        enabled: webAuthn.enabled,
+        credentials,
+      },
+    });
+  }
+
+  async enableWebAuthn( userId: string): Promise<void> {
+    const user = await userService.getUserById(userId);
+
+    const webAuthn = user.mfa?.webAuthn;
+    if (!webAuthn?.credentials?.length) 
+      throw new BadRequestError("No WebAuthn credential is registered.");
+    
+
+    await userService.updateMFA(userId, {
+      webAuthn: {
+        enabled: true,
+        credentials: webAuthn.credentials,
+      },
+    });
+  }
+
+
 }

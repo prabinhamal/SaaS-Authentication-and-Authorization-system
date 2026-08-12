@@ -50,6 +50,28 @@ const mfaSchema: Schema<IMFA> = new mongoose.Schema<IMFA>(
         },
       },
     },
+    webAuthn: {
+      enabled: {
+        type: Boolean,
+        default: false,
+      },
+      credentials: [
+        {
+          credentialId: {
+            type: String,
+            required: true,
+          },
+          publicKey: {
+            type: String,
+            required: true,
+          },
+          counter: {
+            type: Number,
+            required: true,
+          },
+        },
+      ],
+    },
   },
   {
     _id: false,

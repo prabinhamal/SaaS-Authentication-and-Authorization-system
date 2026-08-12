@@ -1,35 +1,54 @@
 
+import {
+  MFAMethodName,
+  MFAProviderMap,
+  MFAEnrollmentResultMap,
+  MFAEnrollmentVerificationInputMap,
+  MFAEnrollmentVerificationResultMap,
+  MFAVerificationInputMap,
+  MFAVerificationResultMap,
+} from "../types/mfa.types";
 
-import { AppError } from "../../utils/AppError";
-import { IMFAProvider, MFAMethodName } from "../types/mfa.types";
+type StartEnrollmentTable = {
+  [M in MFAMethodName]: (userId: string, email: string) => Promise<MFAEnrollmentResultMap[M]>;
+};
+type VerifyEnrollmentTable = {
+  [M in MFAMethodName]: (input: MFAEnrollmentVerificationInputMap[M]) => Promise<MFAEnrollmentVerificationResultMap[M]>;
+};
+type VerifyTable = {
+  [M in MFAMethodName]: (input: MFAVerificationInputMap[M]) => Promise<MFAVerificationResultMap[M]>;
+};
 
 class MFAProviderRegistry {
-
-  private readonly methods = new Map<
-    MFAMethodName,
-    IMFAProvider
-  >();
-
-  constructor(methods: IMFAProvider[]) {
-    for (const method of methods) {
-      this.registerMethod(method);
-    }
+  private readonly startEnrollmentTable: StartEnrollmentTable;
+  private readonly verifyEnrollmentTable: VerifyEnrollmentTable;
+  private readonly verifyTable: VerifyTable;
+  
+  constructor(private readonly providers: MFAProviderMap) {
+    this.startEnrollmentTable = {
+      [MFAMethodName.TOTP]: (userId, email) => this.providers[MFAMethodName.TOTP].startEnrollment(userId, email),
+      [MFAMethodName.WEBAUTHN]: (userId, email) => this.providers[MFAMethodName.WEBAUTHN].startEnrollment(userId, email),
+    };
+    this.verifyEnrollmentTable = {
+      [MFAMethodName.TOTP]: (input) => this.providers[MFAMethodName.TOTP].verifyEnrollment(input),
+      [MFAMethodName.WEBAUTHN]: (input) => this.providers[MFAMethodName.WEBAUTHN].verifyEnrollment(input),
+    };
+    this.verifyTable = {
+      [MFAMethodName.TOTP]: (input) => this.providers[MFAMethodName.TOTP].verify(input),
+      [MFAMethodName.WEBAUTHN]: (input) => this.providers[MFAMethodName.WEBAUTHN].verify(input),
+    };
   }
 
-  registerMethod(method: IMFAProvider): void {
-    if (this.methods.has(method.methodName)) {
-      throw new AppError("MFA method is already registered.");
-    }
-    this.methods.set(method.methodName, method);
+  startEnrollment<M extends MFAMethodName>(method: M, userId: string, email: string): Promise<MFAEnrollmentResultMap[M]> {
+    return this.startEnrollmentTable[method](userId, email);
   }
 
-  getMethod(methodName: MFAMethodName): IMFAProvider {
-    const method = this.methods.get(methodName);
-    if (!method) {
-      throw new AppError("MFA method is not registered.");
-    }
+  verifyEnrollment<M extends MFAMethodName>(method: M, input: MFAEnrollmentVerificationInputMap[M]): Promise<MFAEnrollmentVerificationResultMap[M]> {
+    return this.verifyEnrollmentTable[method](input);
+  }
 
-    return method;
+  verify<M extends MFAMethodName>(method: M, input: MFAVerificationInputMap[M]): Promise<MFAVerificationResultMap[M]> {
+    return this.verifyTable[method](input);
   }
 }
 

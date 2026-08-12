@@ -1,3 +1,4 @@
+import config from "../../config/config";
 
 
 type MFAAlgorithm = "sha1" | "sha256" | "sha512";
@@ -10,8 +11,10 @@ interface TOTPConfig {
   period: number;
 }
 
-interface WebAuthnConfig {
-  // WebAuthn-specific configuration
+export interface WebAuthnConfig {
+  rpName: string;
+  rpID: string;
+  origin: string;
 }
 
 interface BackupCodeConfig {
@@ -32,7 +35,11 @@ export const mfaConfig: Readonly<MFAConfig> = Object.freeze({
     period: 30,
   },
 
-  webAuthn: {},
+  webAuthn: {
+      rpName: "SaaS Authentication and Authorization",
+      rpID: "localhost",
+      origin: config.get("frontendOrigin2")
+    },
 
   backupCode: {},
 });

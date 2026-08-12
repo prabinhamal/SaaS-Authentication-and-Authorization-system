@@ -73,9 +73,11 @@ async updateMFA(
   await UserModel.findByIdAndUpdate(
     userId,
     {
-      $set: {
-        mfa: update,
-      },
+      $set: Object.fromEntries(
+        Object.entries(update).map(
+          ([key, value]) => [`mfa.${key}`, value],
+        ),
+      ),
     },
     {
       runValidators: true,

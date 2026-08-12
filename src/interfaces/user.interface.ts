@@ -5,6 +5,7 @@ import {
   UserRole,
 } from "../constants/user.constants";
 import { EncryptedValue } from "../security/encryption/encryption.types";
+import { WebAuthnCredential } from "../MFA/methods/WebAuth/webAuth.types";
 
 interface IProviders {
   googleId?: string;
@@ -75,5 +76,6 @@ export interface IMFA {
   };
   webAuthn: {
     enabled: boolean;
+    credentials: WebAuthnCredential[];
   };
 }

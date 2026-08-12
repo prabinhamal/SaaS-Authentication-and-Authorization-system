@@ -7,6 +7,7 @@ import config from "./config/config";
 import authRouter from "./routes/auth.route"
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.route"
+import mfaRouter from "./routes/mfa.route"
 import { connectRedis } from "./config/redis.config";
 import corsMiddleware from "./middleware/cors";
 
@@ -26,6 +27,7 @@ connectDatabase();
 connectRedis();
 app.use("/api/v1/", authRouter)
 app.use("/api/v1/", userRouter)
+app.use("/api/v1/", mfaRouter)
 
 /// global error handel
 app.use(notFoundHandler);

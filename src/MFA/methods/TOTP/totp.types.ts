@@ -1,16 +1,28 @@
+import { MFAChallenge } from "../../transaction/mfaTransaction.types";
+
 export interface TOTPEnrollmentResult {
   secret: string;
   otpauthUrl: string;
+  challengeId: string;
 }
 
-interface TOTPVerificationBase {
+export interface MFAEnrollmentVerificationInput {
   challengeId: string;
   code: string;
 }
 
-export interface TOTPEnrollmentVerificationInput  extends TOTPVerificationBase{};
+export interface TOTPEnrollmentVerificationInput extends MFAEnrollmentVerificationInput {
+//   challenge: MFAChallenge;
+}
 
-export interface TOTPVerificationInput extends TOTPVerificationBase{}
+export interface MFAVerificationInput {
+  challengeId: string;
+  code: string;
+}
+
+export interface TOTPVerificationInput extends MFAVerificationInput {
+//   challenge: MFAChallenge;
+}
 
 export interface TOTPEnrollmentVerificationResult {
   verified: true;
