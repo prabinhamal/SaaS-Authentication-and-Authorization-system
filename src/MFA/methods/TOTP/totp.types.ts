@@ -24,10 +24,24 @@ export interface TOTPVerificationInput extends MFAVerificationInput {
 //   challenge: MFAChallenge;
 }
 
-export interface TOTPEnrollmentVerificationResult {
-  verified: true;
+export interface TOTPDisableVerificationInput extends MFAVerificationInput {
+//   challenge: MFAChallenge;
 }
+
+
 
 export interface TOTPVerificationResult {
   verified: true;
 }
+
+export interface TOTPChallengeResult {
+  challengeId: string;
+}
+
+export interface TOTPEnrollmentVerificationResult extends TOTPVerificationResult {}
+
+export interface TOTPAuthenticationResult extends TOTPChallengeResult {}
+
+export interface TOTPDisableResult extends TOTPChallengeResult {}
+
+export interface TOTPDisableVerificationResult extends TOTPVerificationResult {}

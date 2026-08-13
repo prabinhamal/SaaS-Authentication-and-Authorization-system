@@ -2,6 +2,7 @@ import {
   PublicKeyCredentialCreationOptionsJSON,
   RegistrationResponseJSON,
   AuthenticationResponseJSON,
+  PublicKeyCredentialRequestOptionsJSON,
 } from "@simplewebauthn/server";
 
 export interface WebAuthnCredential {
@@ -20,15 +21,40 @@ export interface WebAuthnEnrollmentVerificationInput {
   response: RegistrationResponseJSON;
 }
 
+
+export interface WebAuthnVerificationInput {
+    challengeId: string;
+    response: AuthenticationResponseJSON;
+}
+
 export interface WebAuthnEnrollmentVerificationResult {
   verified: true;
 }
 
-export interface WebAuthnVerificationInput {
+
+export interface WebAuthAuthenticationResult {
   challengeId: string;
-  response: AuthenticationResponseJSON;
+  options: PublicKeyCredentialRequestOptionsJSON;
 }
+
+
 
 export interface WebAuthnVerificationResult {
   verified: true;
+}
+
+export interface WebAuthnChallengeResult {
+  challengeId: string;
+  options: PublicKeyCredentialRequestOptionsJSON;
+}
+
+export interface WebAuthnEnrollmentVerificationResult extends WebAuthnVerificationResult {}
+
+export interface WebAuthDisableResult extends WebAuthnChallengeResult {}
+
+
+
+export interface WebAuthnDisableVerificationInput {
+  challengeId: string;
+  response: AuthenticationResponseJSON;
 }

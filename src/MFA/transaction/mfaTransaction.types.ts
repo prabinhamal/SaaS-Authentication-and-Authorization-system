@@ -3,6 +3,7 @@ import { MFAMethodName } from "../types/mfa.types";
 export enum MFAChallengePurpose {
   ENROLLMENT = "enrollment",
   AUTHENTICATION = "authentication",
+  DISABLE = "disable"
 }
 
 export interface CreateMFAChallengeInput {

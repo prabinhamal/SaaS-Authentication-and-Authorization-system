@@ -1,13 +1,31 @@
 import { TOTPMethods } from "../methods/TOTP/totp.service";
-import { TOTPEnrollmentResult, TOTPEnrollmentVerificationInput, TOTPEnrollmentVerificationResult, TOTPVerificationInput, TOTPVerificationResult } from "../methods/TOTP/totp.types";
+import {
+  TOTPAuthenticationResult,
+  TOTPDisableResult,
+  TOTPDisableVerificationInput,
+  TOTPEnrollmentResult,
+  TOTPEnrollmentVerificationInput,
+  TOTPEnrollmentVerificationResult,
+  TOTPVerificationInput,
+  TOTPVerificationResult,
+} from "../methods/TOTP/totp.types";
 import { WebAuthnMethods } from "../methods/WebAuth/webAuth.service";
-import { WebAuthnEnrollmentResult, WebAuthnEnrollmentVerificationInput, WebAuthnEnrollmentVerificationResult, WebAuthnVerificationInput, WebAuthnVerificationResult } from "../methods/WebAuth/webAuth.types";
+import {
+  WebAuthAuthenticationResult,
+  WebAuthDisableResult,
+  WebAuthnDisableVerificationInput,
+  WebAuthnEnrollmentResult,
+  WebAuthnEnrollmentVerificationInput,
+  WebAuthnEnrollmentVerificationResult,
+  WebAuthnVerificationInput,
+  WebAuthnVerificationResult,
+} from "../methods/WebAuth/webAuth.types";
 
 export enum MFAMethodName {
   TOTP = "totp",
   WEBAUTHN = "webauthn",
-//   SMS = "sms",
-//   EMAIL = "email",
+  //   SMS = "sms",
+  //   EMAIL = "email",
 }
 
 export interface IMFAProvider {
@@ -17,6 +35,21 @@ export interface IMFAProvider {
 export interface MFAEnrollmentResultMap {
   [MFAMethodName.TOTP]: TOTPEnrollmentResult;
   [MFAMethodName.WEBAUTHN]: WebAuthnEnrollmentResult;
+}
+
+export interface MFAAuthenticationMap {
+  [MFAMethodName.TOTP]: TOTPAuthenticationResult;
+  [MFAMethodName.WEBAUTHN]: WebAuthAuthenticationResult;
+}
+
+export interface MFADisableMap {
+  [MFAMethodName.TOTP]: TOTPDisableResult;
+  [MFAMethodName.WEBAUTHN]: WebAuthDisableResult;
+}
+
+export interface MFADisableVerificationInputMap {
+  [MFAMethodName.TOTP]: TOTPDisableVerificationInput;
+  [MFAMethodName.WEBAUTHN]: WebAuthnDisableVerificationInput;
 }
 
 export interface MFAProviderMap {
@@ -35,7 +68,6 @@ export type MFAEnrollmentVerificationRequest = {
     input: MFAEnrollmentVerificationInputMap[M];
   };
 }[MFAMethodName];
-
 
 export interface MFAVerificationInputMap {
   [MFAMethodName.TOTP]: TOTPVerificationInput;
