@@ -1,6 +1,8 @@
 import { redisClient } from "../config/redis.config";
 import { SessionPayload } from "../interfaces";
-import { oauthTransactionSchema } from "../OAuth/providers/schema/token.schema";
+import { authTransactionSchema } from "../lib/schemas/auth.schema";
+import { AuthTransaction, CreateAuthTransactionInput } from "../MFA/types/mfa.types";
+import {  oauthTransactionSchema } from "../OAuth/providers/schema/token.schema";
 import {
   CreateOAuthTransactionInput,
   OAuthTransactionResult,
@@ -89,5 +91,61 @@ export const getOAuthTransaction = async (
 
 export const deleteTransaction = async (tId: string): Promise<void> => {
   const tKey = getOAuthTransactionKey(tId);
+  await redisClient.del(tKey);
+};
+
+
+export const getAuthTransactionKey = (transactionId: string) =>
+  `auth:transaction:${transactionId}`;
+
+
+
+export const storeAuthTransaction = async (
+  tId: string,
+  data: CreateAuthTransactionInput,
+): Promise<AuthTransaction> => {
+  const tKey = getAuthTransactionKey(tId);
+  const AUTH_TRANSACTION_TTL = 5 * 60; /// expired in 5 minutes.
+
+  // console.log("store transaction. ")
+
+await redisClient
+    .multi()
+    .hSet(tKey, {
+     userId: data.userId,
+      stage: data.stage,
+    })
+    .expire(tKey, AUTH_TRANSACTION_TTL)
+    .exec();
+  return {
+    userId: data.userId,
+    stage: data.stage,
+  };
+};
+
+
+export const getAuthTransaction = async (
+  tId: string,
+): Promise<AuthTransaction> => {
+  const tKey = getAuthTransactionKey(tId);
+  const transaction = await redisClient.hGetAll(tKey);
+
+  if (!Object.keys(transaction).length)
+    throw new UnAuthorizedError("Invalid or Expired Auth request.");
+
+  const result = authTransactionSchema.safeParse(transaction);
+
+  if (!result.success)
+    throw new UnAuthorizedError("Invalid Auth transaction.");
+
+  return {
+    stage: result.data.stage,
+    userId: result.data.userId
+    
+  };
+};
+
+export const deleteAuthTransaction = async (tId: string): Promise<void> => {
+  const tKey = getAuthTransactionKey(tId);
   await redisClient.del(tKey);
 };

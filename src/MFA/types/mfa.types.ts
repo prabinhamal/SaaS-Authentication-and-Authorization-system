@@ -90,3 +90,19 @@ export interface MFAVerificationResultMap {
   [MFAMethodName.TOTP]: TOTPVerificationResult;
   [MFAMethodName.WEBAUTHN]: WebAuthnVerificationResult;
 }
+
+
+
+export enum AuthTransactionStage {
+  MFA_REQUIRED = "MFA_REQUIRED",
+}
+
+export interface CreateAuthTransactionInput {
+  userId: string;
+  stage: AuthTransactionStage;
+}
+
+export interface AuthTransaction {
+  userId: string;
+  stage: AuthTransactionStage;
+}
