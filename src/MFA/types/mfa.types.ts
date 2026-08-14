@@ -1,3 +1,4 @@
+import { LoginMethod } from "../../interfaces";
 import { TOTPMethods } from "../methods/TOTP/totp.service";
 import {
   TOTPAuthenticationResult,
@@ -91,8 +92,6 @@ export interface MFAVerificationResultMap {
   [MFAMethodName.WEBAUTHN]: WebAuthnVerificationResult;
 }
 
-
-
 export enum AuthTransactionStage {
   MFA_REQUIRED = "MFA_REQUIRED",
 }
@@ -105,4 +104,5 @@ export interface CreateAuthTransactionInput {
 export interface AuthTransaction {
   userId: string;
   stage: AuthTransactionStage;
+  loginMethod: LoginMethod;
 }

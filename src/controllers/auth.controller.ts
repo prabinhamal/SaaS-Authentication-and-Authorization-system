@@ -10,6 +10,8 @@ import {
   REFRESH_TOKEN_COOKIE,
 } from "../constants/auth.constants";
 import tokenService from "../services/token.service";
+import userService from "../services/user.service";
+import { AuthTransactionStage } from "../MFA/types/mfa.types";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -33,6 +35,19 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       deviceId: req.cookies.deviceId,
     };
     const result = await authService.login(req.body, requestInfo);
+
+    if (result.status === AuthTransactionStage.MFA_REQUIRED) {
+      tokenService.setMFATransactionCookie(res,result.transactionId)
+      return ResponseSend.success(
+        res,
+        "MFA verification required.",
+        {
+          methods: result.methods,
+        },
+        HTTP_STATUS.OK,
+      );
+    }
+
     /// Set Cookies
     tokenService.setAuthCookies({
       response: res,
@@ -41,11 +56,13 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       deviceId: result.deviceId,
       rememberMe: req.body.rememberMe ?? false,
     });
+
+   
     //// Send Response
     return ResponseSend.success(
       res,
       "User logged in successfully.",
-      { user: result.user, accessToken: result.accessToken },
+      { user: userService.sanitizeUser(result.user), accessToken: result.accessToken },
       HTTP_STATUS.OK,
     );
   } catch (error) {

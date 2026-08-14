@@ -6,6 +6,7 @@ import { AccountStatus } from "../constants/user.constants";
 import sessionService from "./session.service";
 import { OAuthProviderName } from "../OAuth/types/oauth.types";
 import { getProviderConfig } from "../utils/oauth.utils";
+import { MFAMethodName } from "../MFA/types/mfa.types";
 
 class UserServices {
   async getUserById(id: string): Promise<IUser> {
@@ -84,6 +85,40 @@ async updateMFA(
     },
   );
 }
+
+
+/// get all mfa enabled methods 
+async getEnabledMFAMethods(userId: string): Promise<MFAMethodName[]> {
+  const user = await this.getUserById(userId);
+
+  const methods: MFAMethodName[] = [];
+
+  if (user.mfa?.totp.enabled) {
+    methods.push(MFAMethodName.TOTP);
+  }
+
+  if (user.mfa?.webAuthn.enabled) {
+    methods.push(MFAMethodName.WEBAUTHN);
+  }
+
+  return methods;
+}
+
+sanitizeUser = (user: UserDocument) => {
+  const userObject = user.toObject();
+
+  return {
+    _id: userObject._id,
+    userName: userObject.userName,
+    email: userObject.email,
+    isEmailVerified: userObject.isEmailVerified,
+    authProvider: userObject.authProvider,
+    role: userObject.role,
+    status: userObject.status,
+    createdAt: userObject.createdAt,
+    updatedAt: userObject.updatedAt,
+  };
+};
 
 }
 export default new UserServices();

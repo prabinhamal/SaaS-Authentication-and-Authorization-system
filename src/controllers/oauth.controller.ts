@@ -6,9 +6,13 @@ import { DeviceRequestInfo } from "../interfaces";
 import tokenService from "../services/token.service";
 import { ResponseSend } from "../utils/response";
 import { HTTP_STATUS } from "../constants/app.constant";
-import { DEVICE_ID_COOKIE, OAUTH_TRANSACTION_COOKIE } from "../constants/auth.constants";
+import {
+  DEVICE_ID_COOKIE,
+  OAUTH_TRANSACTION_COOKIE,
+} from "../constants/auth.constants";
 import config from "../config/config";
-
+import userService from "../services/user.service";
+import { AuthTransactionStage } from "../MFA/types/mfa.types";
 
 class OAuthController {
   startAuthorization = asyncHandler(async (req: Request, res: Response) => {
@@ -42,6 +46,18 @@ class OAuthController {
       requestInfo,
     );
 
+     if (result.status === AuthTransactionStage.MFA_REQUIRED) {
+       tokenService.setMFATransactionCookie(res,result.transactionId)
+       return ResponseSend.success(
+         res,
+         "MFA verification required.",
+         {
+           methods: result.methods,
+         },
+         HTTP_STATUS.OK,
+       );
+     }
+
     tokenService.setAuthCookies({
       response: res,
       accessToken: result.accessToken,
@@ -55,7 +71,7 @@ class OAuthController {
       res,
       "User logged in successfully.",
       {
-        user: result.user,
+        user: userService.sanitizeUser(result.user),
       },
       HTTP_STATUS.OK,
     );

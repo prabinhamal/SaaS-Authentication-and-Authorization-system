@@ -1,3 +1,4 @@
+import { MFAVerificationRequest } from "../MFA/types/mfa.types";
 
 
 
@@ -6,3 +7,6 @@ export interface ChangePasswordInput {
   oldPassword: string;
   newPassword: string;
 }
+export type VerifyMFARequest = MFAVerificationRequest & {
+  transactionId: string;
+};

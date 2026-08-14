@@ -1,6 +1,6 @@
 
 
-import { DeviceRequestInfo, LoginMethod, LoginResult, UserDocument } from "../interfaces";
+import { DeviceRequestInfo, LoginMethod, LoginResult, LoginSessionResult, UserDocument } from "../interfaces";
 import deviceService from "../services/device.service";
 import sessionService from "../services/session.service";
 import tokenService from "../services/token.service";
@@ -23,7 +23,7 @@ interface CreateAuthSessionInput {
  * @returns login result with user, tokens, and device id
  */
 
-export const createAuthSession = async ({user,requestInfo,rememberMe = false, loginMethod}: CreateAuthSessionInput): Promise<LoginResult> => {
+export const createAuthSession = async ({user,requestInfo,rememberMe = false, loginMethod}: CreateAuthSessionInput): Promise<LoginSessionResult> => {
 
   /// generate device information
   const device = deviceService.getDeviceInfo(requestInfo);
@@ -56,6 +56,7 @@ export const createAuthSession = async ({user,requestInfo,rememberMe = false, lo
   });
 
   return {
+    status: "AUTHENTICATED",
     user,
     accessToken,
     refreshToken,

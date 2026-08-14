@@ -26,16 +26,62 @@ import { EmailProviderType } from "../interfaces/email.interface";
 import {
   ChangePasswordInput,
   DeviceRequestInfo,
+  LoginMethod,
+  LoginSessionResult,
   RefreshTokensResult,
+  UserDocument,
+  VerifyMFARequest,
 } from "../interfaces";
 import { OAuthIdentity, OAuthProviderName } from "../OAuth/types/oauth.types";
-import {
-  createOAuthUserData,
-  linkOAuthProvider,
-} from "../utils/oauth.utils";
+import { createOAuthUserData, linkOAuthProvider } from "../utils/oauth.utils";
 import { createAuthSession } from "../utils/auth.utils";
+import { deleteAuthTransaction, getAuthTransaction, storeAuthTransaction } from "../utils/RedisSessionStore";
+import { AuthTransactionStage, MFAAuthenticationMap, MFAMethodName, MFAVerificationRequest } from "../MFA/types/mfa.types";
+import { mfaContainer } from "../MFA/mfaProviderContainer";
 
 class authService {
+  private async completeLogin(
+    user: UserDocument,
+    requestInfo: DeviceRequestInfo,
+    rememberMe: boolean,
+    loginMethod: LoginMethod,
+  ): Promise<LoginResult> {
+    const methods = await userService.getEnabledMFAMethods(user._id.toString());
+
+    //// if mfa enable then
+    if (methods.length > 0) {
+      const transactionId = randomBytes(16);
+
+      await storeAuthTransaction(transactionId, {
+        userId: user._id.toString(),
+        stage: AuthTransactionStage.MFA_REQUIRED,
+        
+      }, loginMethod);
+
+      return {
+        status: AuthTransactionStage.MFA_REQUIRED,
+        transactionId,
+        methods,
+      };
+    }
+
+    return createAuthSession({
+      user,
+      requestInfo,
+      rememberMe,
+      loginMethod,
+    });
+  }
+  private getLoginMethod(provider: OAuthProviderName): LoginMethod {
+  switch (provider) {
+    case OAuthProviderName.GOOGLE:
+      return LoginMethod.GOOGLE;
+
+    case OAuthProviderName.GITHUB:
+      return LoginMethod.GITHUB;
+  }
+}
+
   async register(data: RegisterUserInput): Promise<HydratedDocument<IUser>> {
     /// lookup into the database user is alrady exites
     const existingUser: HydratedDocument<IUser> | null =
@@ -79,12 +125,13 @@ class authService {
 
     if (user.status !== AccountStatus.ACTIVE)
       throw new UnAuthorizedError("Accoun is not active.");
-    return createAuthSession({
+
+    return this.completeLogin(
       user,
       requestInfo,
-      rememberMe: data.remamberMe ?? false,
-      loginMethod: "password",
-    });
+      data.remamberMe ?? false,
+      LoginMethod.PASSWORD,
+    );
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -308,14 +355,60 @@ class authService {
         );
       }
     }
-
-    return createAuthSession({
-      user,
-      requestInfo,
-      rememberMe: true,
-      loginMethod: provider,
-    });
+    return this.completeLogin(user, requestInfo, true, this.getLoginMethod(provider));
   }
+
+
+async verifyMFA(request: VerifyMFARequest,requestInfo: DeviceRequestInfo): Promise<LoginSessionResult> {
+  const transaction = await getAuthTransaction(request.transactionId,);
+
+  if (transaction.stage !== AuthTransactionStage.MFA_REQUIRED) {
+    throw new UnAuthorizedError("Invalid authentication transaction.");
+  }
+
+  const result = await mfaContainer.mfaService.verify({
+    method: request.method,
+    input: request.input,
+  });
+
+  if (!result.verified) {
+    throw new UnAuthorizedError("MFA verification failed.");
+  }
+
+  const user = await UserModel.findById(transaction.userId);
+
+  if (!user) {
+    throw new UnAuthorizedError("User not found.");
+  }
+
+  await deleteAuthTransaction(request.transactionId);
+
+  return createAuthSession({
+    user,
+    requestInfo,
+    rememberMe: false,
+    loginMethod: LoginMethod.PASSWORD,
+  });
+}
+
+async startMFAAuthentication(
+  transactionId: string,
+  method: MFAMethodName,
+): Promise<MFAAuthenticationMap[typeof method]> {
+  const transaction = await getAuthTransaction(transactionId);
+
+  if (transaction.stage !== AuthTransactionStage.MFA_REQUIRED) {
+    throw new UnAuthorizedError(
+      "Invalid authentication transaction.",
+    );
+  }
+
+  return mfaContainer.mfaService.startAuthentication(
+    transaction.userId,
+    method,
+  );
+}
+
 }
 
 export default new authService();

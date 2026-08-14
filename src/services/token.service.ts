@@ -19,6 +19,7 @@ import { CookiesInput } from "../interfaces";
 import {
   ACCESS_TOKEN_COOKIE,
   DEVICE_ID_COOKIE,
+  MFA_TRANSACTION_ID_COOKIE,
   REFRESH_TOKEN_COOKIE,
   REFRESH_TOKEN_TTL,
   REMEMBER_ME_REFRESH_TOKEN_TTL,
@@ -125,5 +126,16 @@ class TokenService {
   getDeviceId(request: Request): string {
     return request.cookies[DEVICE_ID_COOKIE] ?? this.generateDeviceId();
   }
+
+
+  setMFATransactionCookie(res: Response, transactionId: string): void{
+    res.cookie(MFA_TRANSACTION_ID_COOKIE, transactionId, {
+      httpOnly: true,
+      secure: config.get("nodeEnv") === "production",
+      sameSite: "strict",
+      maxAge: 5* 60 * 1000
+    })
+  }
+
 }
 export default new TokenService();

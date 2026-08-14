@@ -1,3 +1,4 @@
+import { LoginMethod } from "../../interfaces";
 import { GithubProviderConfig } from "../providers/github/github.type";
 import { GoogleProviderConfig } from "../providers/google/google.type";
 
@@ -35,8 +36,8 @@ export interface OAuthIdentity {
 }
 
 export enum OAuthProviderName {
-  GOOGLE = "google",
-  GITHUB ="github"
+  GOOGLE = LoginMethod.GOOGLE,
+  GITHUB = LoginMethod.GITHUB,
 }
 
 

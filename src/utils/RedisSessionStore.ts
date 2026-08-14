@@ -1,5 +1,5 @@
 import { redisClient } from "../config/redis.config";
-import { SessionPayload } from "../interfaces";
+import { LoginMethod, SessionPayload } from "../interfaces";
 import { authTransactionSchema } from "../lib/schemas/auth.schema";
 import { AuthTransaction, CreateAuthTransactionInput } from "../MFA/types/mfa.types";
 import {  oauthTransactionSchema } from "../OAuth/providers/schema/token.schema";
@@ -103,6 +103,7 @@ export const getAuthTransactionKey = (transactionId: string) =>
 export const storeAuthTransaction = async (
   tId: string,
   data: CreateAuthTransactionInput,
+  loginMethod: LoginMethod
 ): Promise<AuthTransaction> => {
   const tKey = getAuthTransactionKey(tId);
   const AUTH_TRANSACTION_TTL = 5 * 60; /// expired in 5 minutes.
@@ -114,10 +115,15 @@ await redisClient
     .hSet(tKey, {
      userId: data.userId,
       stage: data.stage,
+      loginMethod
     })
     .expire(tKey, AUTH_TRANSACTION_TTL)
     .exec();
+
+    // console.log(loginMethod)
+
   return {
+    loginMethod,
     userId: data.userId,
     stage: data.stage,
   };
@@ -133,12 +139,15 @@ export const getAuthTransaction = async (
   if (!Object.keys(transaction).length)
     throw new UnAuthorizedError("Invalid or Expired Auth request.");
 
+// console.log(transaction.loginMethod)
+
   const result = authTransactionSchema.safeParse(transaction);
 
   if (!result.success)
     throw new UnAuthorizedError("Invalid Auth transaction.");
 
   return {
+    loginMethod: result.data.loginMethod,
     stage: result.data.stage,
     userId: result.data.userId
     

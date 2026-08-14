@@ -6,110 +6,98 @@ import {
   MFAMethodName,
 } from "../MFA/types/mfa.types";
 import { mfaContainer } from "../MFA/mfaProviderContainer";
-import { MFAVerificationInput } from "../MFA/methods/TOTP/totp.types";
 import { asyncHandler } from "../utils/asyncHandler";
+import { DeviceRequestInfo } from "../interfaces";
+import authService from "../services/auth.service";
+import tokenService from "../services/token.service";
+import { ResponseSend } from "../utils/response";
+import { HTTP_STATUS } from "../constants/app.constant";
 
 class MFAController {
-  startEnrollment = asyncHandler(
-    async (req: Request, res: Response) => {
-      const { method } = req.body as {
-        method: MFAMethodName;
-      };
+  startEnrollment = asyncHandler(async (req: Request, res: Response) => {
+    const { method } = req.body as {method: MFAMethodName;};
+    const result = await mfaContainer.mfaService.startEnrollment(
+      req.user._id,
+      req.user.email,
+      method,
+    );
 
-      if (!method) {
-        throw new BadRequestError(
-          "MFA method is required.",
-        );
-      }
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  });
 
-      const result =
-        await mfaContainer.mfaService.startEnrollment(
-          req.user._id,
-          req.user.email,
-          method,
-        );
+  verifyEnrollment = asyncHandler(async (req: Request, res: Response) => {
+    const request = req.body as MFAEnrollmentVerificationRequest;
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
-    },
-  );
+    const result = await mfaContainer.mfaService.verifyEnrollment(request);
 
-  verifyEnrollment = asyncHandler(
-    async (req: Request, res: Response) => {
-      const request =
-        req.body as MFAEnrollmentVerificationRequest;
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  });
 
-      if (!request.method) {
-        throw new BadRequestError(
-          "MFA method is required.",
-        );
-      }
+  verifyMFA = asyncHandler(async (req: Request, res: Response) => {
+    const transactionId = req.cookies.mfaTransactionId;
 
-      if (!request.input?.challengeId) {
-        throw new BadRequestError(
-          "Challenge ID is required.",
-        );
-      }
+    if (!transactionId) 
+      throw new BadRequestError("MFA authentication transaction is missing.");
+    
 
-      switch (request.method) {
-        case MFAMethodName.TOTP:
-          if (!request.input.code) {
-            throw new BadRequestError(
-              "Verification code is required.",
-            );
-          }
-          break;
+    const requestInfo: DeviceRequestInfo = {
+      ipAddress: req.ip ?? "",
+      userAgent: req.get("user-agent") ?? "",
+      deviceId: req.cookies.deviceId,
+    };
 
-        case MFAMethodName.WEBAUTHN:
-          if (!request.input.response) {
-            throw new BadRequestError(
-              "WebAuthn response is required.",
-            );
-          }
-          break;
+    const result = await authService.verifyMFA(
+      {
+        transactionId,
+        method: req.body.method,
+        input: req.body.input,
+      },
+      requestInfo,
+    );
 
-        default:
-          throw new BadRequestError(
-            "Unsupported MFA method.",
-          );
-      }
+    tokenService.setAuthCookies({
+      response: res,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      deviceId: result.deviceId,
+      rememberMe: true,
+    });
 
-      const result =
-        await mfaContainer.mfaService.verifyEnrollment(
-          request,
-        );
+    return ResponseSend.success(
+      res,
+      "User logged in successfully.",
+      {
+        user: result.user,
+        accessToken: result.accessToken,
+      },
+      HTTP_STATUS.OK,
+    );
+  });
 
-      return res.status(200).json({
-        success: true,
-        data: result,
-      });
-    },
-  );
+  startMFAAuthentication = asyncHandler(async (req: Request, res: Response) => {
+    //// read data
+    const { method } = req.body;
+    const transactionId = req.cookies.mfaTransactionId;
 
-//   verify = asyncHandler(
-//     async (req: Request, res: Response) => {
-//       const input =
-//         req.body as MFAVerificationInput;
+    /// if transaction Id is massing.
+    if (!transactionId) 
+      throw new BadRequestError("MFA authentication transaction is missing.");
+    
+    const result = await authService.startMFAAuthentication(transactionId,method);
 
-//       if (!input.challengeId || !input.code) {
-//         throw new BadRequestError(
-//           "Challenge ID and code are required.",
-//         );
-//       }
-
-//       const result =
-//         await mfaContainer.mfaService.verify(
-//           input,
-//         );
-
-//       return res.status(200).json({
-//         success: true,
-//         data: result,
-//       });
-//     },
-//   );
+    return ResponseSend.success(
+      res,
+      "MFA authentication started successfully.",
+      result,
+      HTTP_STATUS.OK,
+    );
+  });
 }
 
 export default new MFAController();

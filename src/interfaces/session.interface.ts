@@ -1,6 +1,10 @@
 import { DeviceInfo } from "./device.interface";
 
-export type LoginMethod = "password" | "google" | "github";
+export enum LoginMethod {
+  PASSWORD = "password",
+  GOOGLE = "google",
+  GITHUB = "github",
+}
 
 interface SessionBase {
   userId: string;

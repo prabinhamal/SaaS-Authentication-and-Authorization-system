@@ -6,6 +6,7 @@ import {
 } from "../constants/user.constants";
 import { EncryptedValue } from "../security/encryption/encryption.types";
 import { WebAuthnCredential } from "../MFA/methods/WebAuth/webAuth.types";
+import { MFAMethodName } from "../MFA/types/mfa.types";
 
 interface IProviders {
   googleId?: string;
@@ -25,7 +26,7 @@ export interface IUser {
 
   role: UserRole;
 
-  mfa?: IMFA,
+  mfa?: IMFA;
 
   providers?: IProviders;
 
@@ -55,7 +56,24 @@ export interface UpdateUserInput {
   avatarUrl?: string;
 }
 
-export interface LoginResult {
+export interface LoginSuccessResult {
+  status: "AUTHENTICATED";
+  user: UserDocument;
+  accessToken: string;
+  refreshToken: string;
+  deviceId: string;
+}
+
+export interface MFARequiredResult {
+  status: "MFA_REQUIRED";
+  transactionId: string;
+  methods: MFAMethodName[];
+}
+
+export type LoginResult = LoginSuccessResult | MFARequiredResult;
+
+export interface LoginSessionResult {
+  status: "AUTHENTICATED";
   user: UserDocument;
   accessToken: string;
   refreshToken: string;
