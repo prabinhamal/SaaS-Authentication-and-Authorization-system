@@ -21,6 +21,7 @@ export const generateCodeChallenge = (codeVerifier: string): string => {
     .digest("base64url");
 };
 
+export const generateOTP = () => crypto.randomInt(100000, 999999).toString();
 
 
 

@@ -47,7 +47,7 @@ export class TOTPMethods extends MFAMethod<
 }
 
 
-private async verifyTOTPCode(challengeId: string,code: string,purpose: MFAChallengePurpose):Promise<MFAChallenge> {
+private async verifyTOTPCode(challengeId: string,code: string,purpose: MFAChallengePurpose):Promise<MFAChallenge<MFAMethodName.TOTP>> {
   const challenge = await this.challengeService.getValidatedChallenge(
     challengeId,
     MFAMethodName.TOTP,
@@ -69,7 +69,6 @@ private async verifyTOTPCode(challengeId: string,code: string,purpose: MFAChalle
   if (!result.valid) {
     throw new BadRequestError("Invalid TOTP code.");
   }
-
   return challenge;
 }
 
@@ -155,7 +154,7 @@ async verifyDisable(input: TOTPDisableVerificationInput): Promise<void> {
   );
 
   await this.mfaRepository.disableTOTP(challenge.userId);
-  await this.mfaRepository.synchMFADisableState(challenge.userId)
+  await this.mfaRepository.syncMFADisableState(challenge.userId)
   await this.challengeService.deleteChallenge(challenge.id);
 }
 

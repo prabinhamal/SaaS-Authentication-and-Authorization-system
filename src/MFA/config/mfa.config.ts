@@ -42,6 +42,12 @@ export const mfaConfig: Readonly<MFAConfig> = Object.freeze({
     },
 
   backupCode: {},
+
+  email: {
+    otpLength: 6,
+    otpTtl: 5*60,
+    maxAttempts: 5
+  }
 });
 
 

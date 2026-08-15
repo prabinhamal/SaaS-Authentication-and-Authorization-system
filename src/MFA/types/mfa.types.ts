@@ -1,4 +1,15 @@
 import { LoginMethod } from "../../interfaces";
+import { EmailMethods } from "../methods/Email/mfaEmail.service";
+import {
+  EmailAuthenticationResult,
+  EmailDisableResult,
+  EmailDisableVerificationInput,
+  EmailEnrollmentResult,
+  EmailEnrollmentVerificationInput,
+  EmailEnrollmentVerificationResult,
+  EmailVerificationInput,
+  EmailVerificationResult,
+} from "../methods/Email/mfaEmail.types";
 import { TOTPMethods } from "../methods/TOTP/totp.service";
 import {
   TOTPAuthenticationResult,
@@ -21,12 +32,13 @@ import {
   WebAuthnVerificationInput,
   WebAuthnVerificationResult,
 } from "../methods/WebAuth/webAuth.types";
+import { EmailChallenge, MFAChallengePurpose } from "../transaction/mfaTransaction.types";
 
 export enum MFAMethodName {
   TOTP = "totp",
   WEBAUTHN = "webauthn",
   //   SMS = "sms",
-  //   EMAIL = "email",
+  EMAIL = "email",
 }
 
 export interface IMFAProvider {
@@ -36,31 +48,37 @@ export interface IMFAProvider {
 export interface MFAEnrollmentResultMap {
   [MFAMethodName.TOTP]: TOTPEnrollmentResult;
   [MFAMethodName.WEBAUTHN]: WebAuthnEnrollmentResult;
+  [MFAMethodName.EMAIL]: EmailEnrollmentResult;
 }
 
 export interface MFAAuthenticationMap {
   [MFAMethodName.TOTP]: TOTPAuthenticationResult;
   [MFAMethodName.WEBAUTHN]: WebAuthAuthenticationResult;
+  [MFAMethodName.EMAIL]: EmailAuthenticationResult;
 }
 
 export interface MFADisableMap {
   [MFAMethodName.TOTP]: TOTPDisableResult;
   [MFAMethodName.WEBAUTHN]: WebAuthDisableResult;
+  [MFAMethodName.EMAIL]: EmailDisableResult;
 }
 
 export interface MFADisableVerificationInputMap {
   [MFAMethodName.TOTP]: TOTPDisableVerificationInput;
   [MFAMethodName.WEBAUTHN]: WebAuthnDisableVerificationInput;
+  [MFAMethodName.EMAIL]: EmailDisableVerificationInput;
 }
 
 export interface MFAProviderMap {
   [MFAMethodName.TOTP]: TOTPMethods;
   [MFAMethodName.WEBAUTHN]: WebAuthnMethods;
+  [MFAMethodName.EMAIL]: EmailMethods;
 }
 
 export interface MFAEnrollmentVerificationInputMap {
   [MFAMethodName.TOTP]: TOTPEnrollmentVerificationInput;
   [MFAMethodName.WEBAUTHN]: WebAuthnEnrollmentVerificationInput;
+    [MFAMethodName.EMAIL]: EmailEnrollmentVerificationInput;
 }
 
 export type MFAEnrollmentVerificationRequest = {
@@ -73,6 +91,7 @@ export type MFAEnrollmentVerificationRequest = {
 export interface MFAVerificationInputMap {
   [MFAMethodName.TOTP]: TOTPVerificationInput;
   [MFAMethodName.WEBAUTHN]: WebAuthnVerificationInput;
+   [MFAMethodName.EMAIL]: EmailVerificationInput;
 }
 
 export type MFAVerificationRequest = {
@@ -85,11 +104,13 @@ export type MFAVerificationRequest = {
 export interface MFAEnrollmentVerificationResultMap {
   [MFAMethodName.TOTP]: TOTPEnrollmentVerificationResult;
   [MFAMethodName.WEBAUTHN]: WebAuthnEnrollmentVerificationResult;
+  [MFAMethodName.EMAIL]: EmailEnrollmentVerificationResult;
 }
 
 export interface MFAVerificationResultMap {
   [MFAMethodName.TOTP]: TOTPVerificationResult;
   [MFAMethodName.WEBAUTHN]: WebAuthnVerificationResult;
+    [MFAMethodName.EMAIL]: EmailVerificationResult;
 }
 
 export enum AuthTransactionStage {
@@ -105,4 +126,10 @@ export interface AuthTransaction {
   userId: string;
   stage: AuthTransactionStage;
   loginMethod: LoginMethod;
+}
+
+export interface MFAMetadataMap {
+  [MFAMethodName.TOTP]: Record<string, never>;
+  [MFAMethodName.WEBAUTHN]: Record<string, never>;
+  [MFAMethodName.EMAIL]: EmailChallenge;
 }

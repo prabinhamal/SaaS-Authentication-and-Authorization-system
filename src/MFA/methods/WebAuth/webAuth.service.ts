@@ -21,7 +21,7 @@ import {
   WebAuthnVerificationResult,
 } from "./webAuth.types";
 import { MFAChallengePurpose } from "../../transaction/mfaTransaction.types";
-import { AppError, BadRequestError } from "../../../utils/AppError";
+import { BadRequestError } from "../../../utils/AppError";
 
 // class WEBAuthnMethod extends MFAMethod
 export class WebAuthnMethods extends MFAMethod<
@@ -221,7 +221,7 @@ async verifyDisable(
   );
 
   await this.mfaRepository.disableWebAuthn(challenge.userId);
-  await this.mfaRepository.synchMFADisableState(challenge.userId)
+  await this.mfaRepository.syncMFADisableState(challenge.userId)
   await this.transactionService.deleteChallenge(challenge.id);
 }
 

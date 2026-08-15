@@ -12,6 +12,7 @@ import authService from "../services/auth.service";
 import tokenService from "../services/token.service";
 import { ResponseSend } from "../utils/response";
 import { HTTP_STATUS } from "../constants/app.constant";
+import userService from "../services/user.service";
 
 class MFAController {
   startEnrollment = asyncHandler(async (req: Request, res: Response) => {
@@ -69,11 +70,12 @@ class MFAController {
       rememberMe: true,
     });
 
+    const sanitizeUserData = userService.sanitizeUser(result.user)
     return ResponseSend.success(
       res,
       "User logged in successfully.",
       {
-        user: result.user,
+        user: sanitizeUserData,
         accessToken: result.accessToken,
       },
       HTTP_STATUS.OK,

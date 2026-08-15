@@ -9,6 +9,7 @@ import { mfaConfig } from "./config/mfa.config";
 import { MFAService } from "./mfa.service";
 import { WebAuthnMethods } from "./methods/WebAuth/webAuth.service";
 import { MFAMethodName } from "./types/mfa.types";
+import { EmailMethods } from "./methods/Email/mfaEmail.service";
 
 export class MFAProviderContainer {
   /// initialize all container member classes
@@ -20,6 +21,8 @@ export class MFAProviderContainer {
   readonly totpMethods: TOTPMethods;
 
   readonly webAuthnMethods: WebAuthnMethods;
+
+  readonly emailMethods: EmailMethods;
 
   readonly providerRegistry: MFAProviderRegistry;
 
@@ -45,10 +48,16 @@ export class MFAProviderContainer {
       this.mfaRepository,
       this.challengeService,
     );
+    this.emailMethods = new EmailMethods(
+      mfaConfig,
+      this.mfaRepository,
+      this.challengeService
+    )
 
   this.providerRegistry = new MFAProviderRegistry({
   [MFAMethodName.TOTP]: this.totpMethods,
   [MFAMethodName.WEBAUTHN]: this.webAuthnMethods,
+  [MFAMethodName.EMAIL]: this.emailMethods
 });/// register all MFA methods.
 
     //// Main MFA Service

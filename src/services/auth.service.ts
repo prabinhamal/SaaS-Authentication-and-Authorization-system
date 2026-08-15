@@ -48,6 +48,8 @@ class authService {
   ): Promise<LoginResult> {
     const methods = await userService.getEnabledMFAMethods(user._id.toString());
 
+    // console.log(methods)
+
     //// if mfa enable then
     if (methods.length > 0) {
       const transactionId = randomBytes(16);
@@ -115,9 +117,7 @@ class authService {
 
     /// if user find then check password is match or not
     if (!user.password)
-      throw new BadRequestError(
-        "Password login is not available for this account.",
-      );
+      throw new BadRequestError("Password login is not available for this account.");
 
     const isPasswordVerify = await verifyHash(user.password, data.password);
 

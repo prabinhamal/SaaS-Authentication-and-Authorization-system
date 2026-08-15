@@ -48,7 +48,7 @@ export class MFARepository {
   }
 
 
-   async synchMFADisableState(userId: string): Promise<void> {
+   async syncMFADisableState(userId: string): Promise<void> {
   const user = await userService.getUserById(userId);
 
   const mfa = user.mfa;
@@ -216,4 +216,46 @@ export class MFARepository {
       },
     });
   }
+
+
+
+//// Email
+async enableEmail(userId: string): Promise<void> {
+  const user = await userService.getUserById(userId);
+
+  if (!user.mfa?.email) {
+    throw new BadRequestError("Email MFA is not configured.");
+  }
+
+  await userService.updateMFA(userId, {
+    email: {
+      enabled: true,
+    },
+  });
+}
+
+async disableEmail(userId: string): Promise<void> {
+  const user = await userService.getUserById(userId);
+
+  if (!user.mfa?.email) {
+    throw new BadRequestError("Email MFA is not configured.");
+  }
+
+  await userService.updateMFA(userId, {
+    email: {
+      enabled: false,
+    },
+  });
+}
+
+async getEmailMFA(userId: string): Promise<{enabled: boolean;email: string;}> {
+  const user = await userService.getUserById(userId);
+  if (!user.mfa?.email) throw new BadRequestError("Email MFA is not configured.");
+  
+  return {
+    enabled: user.mfa.email.enabled,
+    email: user.email,
+  };
+}
+
 }

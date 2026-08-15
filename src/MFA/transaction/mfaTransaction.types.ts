@@ -1,18 +1,28 @@
-import { MFAMethodName } from "../types/mfa.types";
+import { MFAMetadataMap, MFAMethodName } from "../types/mfa.types";
 
 export enum MFAChallengePurpose {
   ENROLLMENT = "enrollment",
   AUTHENTICATION = "authentication",
-  DISABLE = "disable"
+  DISABLE = "disable",
 }
 
-export interface CreateMFAChallengeInput {
+export type CreateMFAChallengeInput<M extends MFAMethodName> = {
   userId: string;
-  method: MFAMethodName;
+  method: M;
   purpose: MFAChallengePurpose;
-  challenge?: string;
-}
+  challenge?: string | undefined;
+  metadata?: MFAMetadataMap[M] | undefined;
+};
 
-export interface MFAChallenge extends CreateMFAChallengeInput {
-  id: string;
+export type MFAChallenge<M extends MFAMethodName> =
+  CreateMFAChallengeInput<M> & {
+    id: string;
+  };
+
+export interface EmailChallenge {
+  codeHash: string;
+  attempts: number;
 }
+export type AnyMFAChallenge = {
+  [M in MFAMethodName]: MFAChallenge<M>;
+}[MFAMethodName];

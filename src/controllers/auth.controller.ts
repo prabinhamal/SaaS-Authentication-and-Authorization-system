@@ -58,11 +58,13 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     });
 
    
+    const sanitizeUserData = userService.sanitizeUser(result.user)
+
     //// Send Response
     return ResponseSend.success(
       res,
       "User logged in successfully.",
-      { user: userService.sanitizeUser(result.user), accessToken: result.accessToken },
+      { user: sanitizeUserData, accessToken: result.accessToken },
       HTTP_STATUS.OK,
     );
   } catch (error) {
