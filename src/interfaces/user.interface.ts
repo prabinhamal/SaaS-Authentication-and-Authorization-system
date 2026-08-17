@@ -96,4 +96,10 @@ export interface IMFA {
     enabled: boolean;
     credentials: WebAuthnCredential[];
   };
+  
+  recoveryEmail: {
+    email: string;
+    verified: boolean;
+    verifiedAt?: Date;
+  };
 }

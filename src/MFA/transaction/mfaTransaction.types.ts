@@ -4,6 +4,9 @@ export enum MFAChallengePurpose {
   ENROLLMENT = "enrollment",
   AUTHENTICATION = "authentication",
   DISABLE = "disable",
+
+  RECOVERY_EMAIL_ENROLLMENT = "recovery_email_enrollment",
+  RECOVERY_EMAIL = "recovery_email",
 }
 
 export type CreateMFAChallengeInput<M extends MFAMethodName> = {
