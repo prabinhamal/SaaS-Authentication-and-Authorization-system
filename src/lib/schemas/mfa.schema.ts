@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MFAMethodName } from "../../MFA/types/mfa.types";
+import { MFARecoveryCodeStatus } from "../../interfaces/mfa.interface";
 
 const totpVerificationInputSchema = z.object({
   challengeId: z
@@ -47,6 +48,21 @@ export const mfaVerificationSchema = z.discriminatedUnion(
     }),
   ],
 );
+
+export const mfaRecoveryCodeSchema = z.object({
+  setId: z.string().min(1, "Set id is required."),
+
+  generation: z.number().int().positive("Generation must be a positive integer."),
+  lookupKey: z.string().min(1, "Lookup key is required."),
+
+  codeHash: z.string().min(1, "Code hash is required."),
+  status: z.enum(MFARecoveryCodeStatus),
+  usedAt: z.date().optional(),
+  revokedAt: z.date().optional(),
+
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
 
 export type MFAVerificationRequest = z.infer<
   typeof mfaVerificationSchema

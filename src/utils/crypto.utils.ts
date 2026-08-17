@@ -38,9 +38,13 @@ export const generateOTP = () => crypto.randomInt(100000, 999999).toString();
 //   return code;
 // }
 
- export const generateRecoveryCode = (): string => {
-  const chunk = Array.from({length: 3}, ()=>crypto.randomBytes(2).toString('hex').toUpperCase());
-  return chunk.join("-")
+ export const generateRecoveryCode = (chunkLength: number, chunkCount: number, separator: string): string => {
+  const chunk = Array.from({length: chunkCount}, ()=>crypto.randomBytes(chunkLength).toString('hex').toUpperCase());
+  return chunk.join(separator)
+ }
+
+ export const hashLookupKey = (code: string, secret: string): string => {
+  return crypto.createHmac("sha256", secret).update(code).digest("hex")
  }
 
 

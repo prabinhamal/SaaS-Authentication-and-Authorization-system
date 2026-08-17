@@ -30,6 +30,8 @@ interface Config {
   github_scopes: string,
 
   aes_256_secret: string,
+
+  mfa_lookup_keySecret: string,
   
 }
 
@@ -68,6 +70,7 @@ const _config: Config = Object.freeze({
   google_access_type: requireEnv("GOOGLE_ACCESS_TYPE"),
 
   aes_256_secret: requireEnv("AES_256_SECRET"),
+  mfa_lookup_keySecret: requireEnv("MFA_LOOKUP_KEY_SECRET")
 });
 
 type ConfigKey = keyof Config;
