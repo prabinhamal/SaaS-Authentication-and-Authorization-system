@@ -93,7 +93,7 @@ const mfaSchema: Schema<IMFA> = new mongoose.Schema<IMFA>(
         type: Date,
       },
 
-      default: null,
+      // default: null,
     },
   },
   {
