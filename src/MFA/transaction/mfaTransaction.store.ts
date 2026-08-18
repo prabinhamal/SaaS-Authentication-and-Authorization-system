@@ -11,7 +11,7 @@ export const storeMFAChallenge = async <M extends MFAMethodName>(
   challenge: MFAChallenge<M>,
 ): Promise<MFAChallenge<M>> => {
   const challengeKey = getMFAChallengeKey(challenge.id);
-  const MFA_CHALLENGE_TTL = 5 * 60;
+  const MFA_CHALLENGE_TTL = 15 * 60;
 
   await redisClient
     .multi()

@@ -12,15 +12,18 @@ import { MFARecoveryService } from "./recovery.service";
 import { MFATransactionService } from "../transaction/mfaTransaction.service";
 import { mfaConfig } from "../config/mfa.config";
 import { mfaContainer } from "../mfaProviderContainer";
+import { MFAService } from "../mfa.service";
 
 export class MFARecoveryContainer {
   readonly recoveryCodeService: RecoveryCode;
   readonly recoveryEmailService: MFARecoveryEmailService;
   readonly authorizationService: MFARecoveryAuthorizationService;
   readonly recoveryService: MFARecoveryService;
+  
 
   constructor(
     private readonly challengeService: MFATransactionService,
+    private readonly mfaService: MFAService,
   ) {
     // Authorization
     const authorizationRepository = new MFARecoveryAuthorizationRepository();
@@ -50,8 +53,10 @@ export class MFARecoveryContainer {
       this.recoveryCodeService,
       this.recoveryEmailService,
       this.authorizationService,
+      this.challengeService,
+      this.mfaService
     );
   }
 }
 
-export const mfaRecoveryContainer = new MFARecoveryContainer(mfaContainer.challengeService)
+export const mfaRecoveryContainer = new MFARecoveryContainer(mfaContainer.challengeService, mfaContainer.mfaService)

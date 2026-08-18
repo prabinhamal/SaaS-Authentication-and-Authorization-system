@@ -16,6 +16,7 @@ export class MFARecoveryAuthorizationService {
     transactionId: string,
     scopes: MFARecoveryAuthorizationScope[],
   ): Promise<MFARecoveryAuthorizationRecord> {
+    
     const record: MFARecoveryAuthorizationRecord = {
       id: randomUUID(),
       userId,

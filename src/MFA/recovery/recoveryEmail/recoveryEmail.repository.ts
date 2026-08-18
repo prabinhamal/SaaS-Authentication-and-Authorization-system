@@ -16,6 +16,21 @@ export class MFARecoveryEmailRepository {
     return user?.mfa?.recoveryEmail ?? null;
   }
 
+    async getUnVerifiedRecoveryEmail(userId: string): Promise<MFARecoveryEmail | null> {
+    const user = await UserModel.findOne(
+      {
+        _id: userId,
+        "mfa.recoveryEmail.verified": false,
+      },
+      {
+        "mfa.recoveryEmail": 1,
+      },
+    ).lean();
+
+    return user?.mfa?.recoveryEmail ?? null;
+  }
+
+
   async setRecoveryEmail(userId: string, email: string): Promise<void> {
     await UserModel.findOneAndUpdate(
       {

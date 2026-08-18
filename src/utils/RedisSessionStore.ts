@@ -106,7 +106,7 @@ export const storeAuthTransaction = async (
   loginMethod: LoginMethod
 ): Promise<AuthTransaction> => {
   const tKey = getAuthTransactionKey(tId);
-  const AUTH_TRANSACTION_TTL = 5 * 60; /// expired in 5 minutes.
+  const AUTH_TRANSACTION_TTL = 10 * 60; /// expired in 10 minutes.
 
   // console.log("store transaction. ")
 

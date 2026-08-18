@@ -111,6 +111,38 @@ export class MFARecoveryEmailService {
     };
   }
 
+  async resendVerifactionCode(challengeId: string): Promise<MFARecoveryEmailEnrollmentResult> {
+    const challenge = await this.challengeService.getChallenge(challengeId);
+
+    if (!challenge)
+      throw new UnAuthorizedError("Expired or corrupted challenge code.");
+    ////  Generate OTP
+    const otp = generateOTP(); // it return 6 digit random code, using crypto
+
+    ///// Hash OTP
+    const hashOtp = await hashData(otp);
+    /// Create verification challenge
+
+    const email = await this.recoveryEmailRepository.getUnVerifiedRecoveryEmail(challenge.userId) 
+
+    if(!email) throw new UnAuthorizedError("Invalid email.")
+
+    await this.challengeService.updateChallengeMetadata(challengeId,  MFAMethodName.EMAIL, {codeHash: hashOtp, attempts: 0});
+
+        //// Send verification email
+    const providerEmail = emailProvider(EmailProviderType.NODEMAILER);
+    const emailBody = mfaRecoveryEmailVerificationTemplate(otp);
+    await providerEmail.sendEmail(
+      email.email,
+      "Verify Recovery Email.",
+      emailBody,
+    );
+
+    return {
+      challengeId: challenge.id,
+    };
+  }
+
   async verifyEnrollment(
     input: MFARecoveryEmailVerificationInput,
   ): Promise<MFARecoveryEmailVerificationResult> {
@@ -188,10 +220,13 @@ export class MFARecoveryEmailService {
   }
 
   async remove(userId: string): Promise<void> {
-    const recoveryEmail = await this.recoveryEmailRepository.getRecoveryEmail(userId);
+    const recoveryEmail =
+      await this.recoveryEmailRepository.getRecoveryEmail(userId);
 
     if (!recoveryEmail) {
-      throw new BadRequestError("No recovery email is configured for this account.");
+      throw new BadRequestError(
+        "No recovery email is configured for this account.",
+      );
     }
 
     await this.recoveryEmailRepository.removeRecoveryEmail(userId);

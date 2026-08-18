@@ -18,11 +18,20 @@ class RecoveryCode {
     private readonly recoveryRepository: MFARecoveryCodeRepository,
   ) {}
 
-  async generateRecoveryCodes(userId: string, generation: number): Promise<string[]> {
+  private async getNextGeneration(userId: string): Promise<number> {
+  const latestGeneration =
+    await this.recoveryRepository.getLatestGeneration(userId);
+
+  return latestGeneration + 1;
+}
+
+  async generateRecoveryCodes(userId: string): Promise<string[]> {
     const setId = crypto.randomUUID();
 
     const plainTextCodes: string[] = [];
     const recoveryCodes: IMFARecoveryCode[] = [];
+
+    const latestGeneration = await this.getNextGeneration(userId)
 
     for (let i = 0; i < this.config.count; i++) {
       const code = generateRecoveryCode(
@@ -44,7 +53,7 @@ class RecoveryCode {
       recoveryCodes.push({
         userId: new mongoose.Types.ObjectId(userId),
         setId,
-        generation, 
+        generation: latestGeneration, 
         lookupKey,
         codeHash,
         status: MFARecoveryCodeStatus.ACTIVE,
@@ -99,12 +108,12 @@ class RecoveryCode {
       await this.recoveryRepository.revokeSet(userId, activeSetId);
     }
 
-    const latestGeneration =
-      await this.recoveryRepository.getLatestGeneration(userId);
+    // const latestGeneration =
+    //   await this.recoveryRepository.getLatestGeneration(userId);
 
-    const nextGeneration = latestGeneration + 1;
+    // const nextGeneration = latestGeneration + 1;
 
-    return this.generateRecoveryCodes(userId, nextGeneration);
+    return this.generateRecoveryCodes(userId);
   }
 
   async revokeRecoveryCode(userId: string, codeId: string): Promise<void> {
