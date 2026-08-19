@@ -5,7 +5,7 @@ import { redisClient } from "../../config/redis.config";
 import { UnAuthorizedError } from "../../utils/AppError";
 import { mfaRecoveryAuthorizationRecordSchema } from "./mfaRecovery-authorization.schema";
 const MFA_RECOVERY_AUTHORIZATION_KEY_PREFIX = "mfa:recovery:authorization";
-const MFA_RECOVERY_AUTHORIZATION_TTL_SECONDS = 5 * 60;
+const MFA_RECOVERY_AUTHORIZATION_TTL_SECONDS = 10 * 60;
 
 export class MFARecoveryAuthorizationRepository {
   private getAuthorizationKey = (id: string): string =>

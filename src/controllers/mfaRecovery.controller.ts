@@ -148,7 +148,6 @@ class MFARecoveryController {
     if (!transactionId)
       throw new BadRequestError("MFA authentication transaction is missing.");
 
-
     const result = await this.recoveryService.verifyRecoveryCode(
       transactionId,
       code,
@@ -164,4 +163,61 @@ class MFARecoveryController {
       HTTP_STATUS.OK,
     );
   });
+
+  //// MFA Recovery Authorization → Enrollment
+
+  authorizeEnrollment = asyncHandler(async (req: Request, res: Response) => {
+    const { authorizationId, method, email } = req.body;
+
+    const transactionId = req.cookies.mfaTransactionId;
+
+    if (!transactionId) {
+      throw new BadRequestError("MFA authentication transaction is missing.");
+    }
+
+    const result = await this.recoveryService.authorizeEnrollment(
+      authorizationId,
+      transactionId,
+      email,
+      method,
+    );
+
+    return ResponseSend.success(
+      res,
+      "MFA enrollment started.",
+      result,
+      HTTP_STATUS.OK,
+    );
+  });
+
+  completeRecoveryEnrollment = asyncHandler(
+    async (req: Request, res: Response) => {
+      const { authorizationId } = req.body;
+
+      const transactionId = req.cookies.mfaTransactionId;
+
+      if (!transactionId) {
+        throw new BadRequestError("MFA authentication transaction is missing.");
+      }
+
+      const result = await this.recoveryService.completeRecoveryEnrollment(
+        authorizationId,
+        transactionId,
+        req.body,
+      );
+
+      if (!result.verified) {
+        throw new UnAuthorizedError("MFA enrollment verification failed.");
+      }
+
+      return ResponseSend.success(
+        res,
+        "MFA recovery completed successfully.",
+        result,
+        HTTP_STATUS.OK,
+      );
+    },
+  );
 }
+
+export default new MFARecoveryController();

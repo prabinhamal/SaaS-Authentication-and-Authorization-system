@@ -79,7 +79,7 @@ const mfaSchema: Schema<IMFA> = new mongoose.Schema<IMFA>(
       },
     },
     recoveryEmail: {
-      enabled: {
+      verified: {
         type: Boolean,
         default: false,
       },
