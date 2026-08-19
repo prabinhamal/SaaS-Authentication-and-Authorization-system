@@ -16,7 +16,7 @@ import userService from "../services/user.service";
 
 class MFAController {
   startEnrollment = asyncHandler(async (req: Request, res: Response) => {
-    const { method } = req.body as {method: MFAMethodName;};
+    const { method } = req.body as { method: MFAMethodName };
     const result = await mfaContainer.mfaService.startEnrollment(
       req.user._id,
       req.user.email,
@@ -43,9 +43,8 @@ class MFAController {
   verifyMFA = asyncHandler(async (req: Request, res: Response) => {
     const transactionId = req.cookies.mfaTransactionId;
 
-    if (!transactionId) 
+    if (!transactionId)
       throw new BadRequestError("MFA authentication transaction is missing.");
-    
 
     const requestInfo: DeviceRequestInfo = {
       ipAddress: req.ip ?? "",
@@ -70,7 +69,7 @@ class MFAController {
       rememberMe: true,
     });
 
-    const sanitizeUserData = userService.sanitizeUser(result.user)
+    const sanitizeUserData = userService.sanitizeUser(result.user);
     return ResponseSend.success(
       res,
       "User logged in successfully.",
@@ -88,15 +87,48 @@ class MFAController {
     const transactionId = req.cookies.mfaTransactionId;
 
     /// if transaction Id is massing.
-    if (!transactionId) 
+    if (!transactionId)
       throw new BadRequestError("MFA authentication transaction is missing.");
-    
-    const result = await authService.startMFAAuthentication(transactionId,method);
+
+    const result = await authService.startMFAAuthentication(
+      transactionId,
+      method,
+    );
 
     return ResponseSend.success(
       res,
       "MFA authentication started successfully.",
       result,
+      HTTP_STATUS.OK,
+    );
+  });
+
+  startMFADisable = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user._id;
+    const { method } = req.body;
+
+    const result = await authService.startMFADisable(method, userId);
+
+    return ResponseSend.success(
+      res,
+      "MFA disable verification required.",
+      result,
+      HTTP_STATUS.OK,
+    );
+  });
+
+  verifyMFADisable = asyncHandler(async (req: Request, res: Response) => {
+    const { method, input } = req.body;
+
+    await authService.verifyMFADisable({
+      method,
+      input,
+    });
+
+    return ResponseSend.success(
+      res,
+      "MFA disabled successfully.",
+      null,
       HTTP_STATUS.OK,
     );
   });

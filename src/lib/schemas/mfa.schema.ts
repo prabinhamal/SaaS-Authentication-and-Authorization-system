@@ -58,6 +58,32 @@ export const mfaRecoveryCodeSchema = z.object({
   updatedAt: z.date().optional(),
 });
 
+
+export const mfaDisableVerificationSchema = z.discriminatedUnion("method", [
+  z.object({
+    method: z.literal(MFAMethodName.TOTP),
+    input: totpVerificationInputSchema,
+  }),
+
+  z.object({
+    method: z.literal(MFAMethodName.WEBAUTHN),
+    input: webAuthnVerificationInputSchema,
+  }),
+
+  z.object({
+    method: z.literal(MFAMethodName.EMAIL),
+    input: emailVerificationInputSchema,
+  }),
+]);
+
+export const startMFADisableSchema = z
+  .object({
+    method: z.enum(MFAMethodName),
+  })
+  .strict();
+
+
+
 export type MFAVerificationRequest = z.infer<typeof mfaVerificationSchema>;
 
 export const startEnrollmentSchema = z.object({

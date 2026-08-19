@@ -36,7 +36,7 @@ import { OAuthIdentity, OAuthProviderName } from "../OAuth/types/oauth.types";
 import { createOAuthUserData, linkOAuthProvider } from "../utils/oauth.utils";
 import { createAuthSession } from "../utils/auth.utils";
 import { deleteAuthTransaction, getAuthTransaction, storeAuthTransaction } from "../utils/RedisSessionStore";
-import { AuthTransactionStage, MFAAuthenticationMap, MFAMethodName, MFAVerificationRequest } from "../MFA/types/mfa.types";
+import { AuthTransactionStage, MFAAuthenticationMap, MFADisableMap, MFADisableVerificationInputMap, MFAMethodName, MFAVerificationRequest } from "../MFA/types/mfa.types";
 import { mfaContainer } from "../MFA/mfaProviderContainer";
 
 class authService {
@@ -408,6 +408,23 @@ async startMFAAuthentication(
     method,
   );
 }
+
+async startMFADisable<M extends MFAMethodName>(method: M,userId: string): Promise<MFADisableMap[M]> {
+  return mfaContainer.mfaService.startDisable(
+    userId,
+    method,
+  );
+}
+
+async verifyMFADisable<M extends MFAMethodName>(
+  request: {
+    method: M;
+    input: MFADisableVerificationInputMap[M];
+  },
+): Promise<void> {
+  await mfaContainer.mfaService.verifyDisable(request);
+}
+
 
 }
 
