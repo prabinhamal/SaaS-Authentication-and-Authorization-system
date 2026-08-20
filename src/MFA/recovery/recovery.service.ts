@@ -15,7 +15,6 @@ export class MFARecoveryService {
     private readonly recoveryCodeService: RecoveryCode,
     private readonly recoveryEmailService: MFARecoveryEmailService,
     private readonly authorizationService: MFARecoveryAuthorizationService,
-    private readonly mfaChallengeService: MFATransactionService,
     private readonly mfaService: MFAService,
   ) {}
 

@@ -11,6 +11,9 @@ export interface WebAuthnCredential {
   counter: number;
 }
 
+
+
+
 export interface WebAuthnEnrollmentResult {
   challengeId: string;
   options: PublicKeyCredentialCreationOptionsJSON;

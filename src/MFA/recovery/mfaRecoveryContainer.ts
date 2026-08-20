@@ -53,7 +53,6 @@ export class MFARecoveryContainer {
       this.recoveryCodeService,
       this.recoveryEmailService,
       this.authorizationService,
-      this.challengeService,
       this.mfaService
     );
   }

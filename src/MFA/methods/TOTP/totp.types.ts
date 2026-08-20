@@ -1,4 +1,4 @@
-import { MFAChallenge } from "../../transaction/mfaTransaction.types";
+
 
 export interface TOTPEnrollmentResult {
   secret: string;
@@ -11,22 +11,13 @@ export interface MFAEnrollmentVerificationInput {
   code: string;
 }
 
-export interface TOTPEnrollmentVerificationInput extends MFAEnrollmentVerificationInput {
-//   challenge: MFAChallenge;
-}
+export interface TOTPEnrollmentVerificationInput extends MFAEnrollmentVerificationInput {}
 
-export interface MFAVerificationInput {
-  challengeId: string;
-  code: string;
-}
+export interface MFAVerificationInput extends MFAEnrollmentVerificationInput {};
 
-export interface TOTPVerificationInput extends MFAVerificationInput {
-//   challenge: MFAChallenge;
-}
+export interface TOTPVerificationInput extends MFAEnrollmentVerificationInput {};
 
-export interface TOTPDisableVerificationInput extends MFAVerificationInput {
-//   challenge: MFAChallenge;
-}
+export interface TOTPDisableVerificationInput extends MFAEnrollmentVerificationInput {};
 
 
 

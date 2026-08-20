@@ -34,7 +34,7 @@ export class MFARepository {
     }
 
     const hasEnabledMethod =
-      mfa.totp?.enabled === true || mfa.webAuthn?.enabled === true;
+      mfa.totp?.enabled === true || mfa.webAuthn?.enabled === true || mfa.email?.enabled === true;
 
     if (!hasEnabledMethod) {
       throw new BadRequestError("No MFA method is enabled.");
