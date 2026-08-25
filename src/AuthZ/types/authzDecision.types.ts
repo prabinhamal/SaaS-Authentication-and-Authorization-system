@@ -13,7 +13,7 @@ enum EvaluatorType {
   OWNERSHIP = "ownership",
 }
 
-enum FinalEffect {
+export enum FinalEffect {
   ALLOW = "ALLOW",
   DENY = "DENY",
 }

@@ -1,15 +1,15 @@
-enum SubjectType {
+export enum SubjectType {
   USER = "user",
   SERVICE = "service",
   APIKEY = "apikey",
 }
 
-enum AuthenticationStrength {
+export enum AuthenticationStrength {
   WEAK = "weak",
   STRONG = "strong",
   MFA = "mfa",
 }
-enum RequestOrigin {
+export enum RequestOrigin {
   API = "api",
   WEB = "web",
   INTERNAL_SERVICE = "internal-service",
