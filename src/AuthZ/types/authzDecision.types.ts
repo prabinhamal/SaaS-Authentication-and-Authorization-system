@@ -1,12 +1,12 @@
 
 
-enum DecisionEffect {
+export enum DecisionEffect {
   ALLOW = "ALLOW",
   DENY = "DENY",
   NOT_APPLICABLE = "NOT_APPLICABLE",
   ERROR = "ERROR",
 }
-enum EvaluatorType {
+export enum EvaluatorType {
   RBAC = "rbac",
   ABAC = "abac",
   REBAC = "rebac",
@@ -18,7 +18,7 @@ export enum FinalEffect {
   DENY = "DENY",
 }
 
-enum ObligationType {
+export enum ObligationType {
   REDACT_FIELD = "redact-field",
   REQUIRE_REAUTH = "require-reauth",
   LOG_ELEVATED = "log-elevated",
