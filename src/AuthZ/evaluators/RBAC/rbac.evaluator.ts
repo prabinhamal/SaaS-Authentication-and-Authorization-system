@@ -7,7 +7,7 @@ import {
 import { AuthzRequest } from "../../types/authzRequest.types";
 import { ScopeType } from "../../types/scope.types";
 
-class RBACEvaluator {
+export class RBACEvaluator {
   constructor(private readonly roleAssignmentService: RoleAssignmentService) {}
 
   async evaluateRbac(request: AuthzRequest): Promise<EvaluatorDecision> {
@@ -17,7 +17,7 @@ class RBACEvaluator {
       return {
         evaluator: EvaluatorType.RBAC,
         effect: DecisionEffect.NOT_APPLICABLE,
-        reason: "no-organization-scope-in-contex",
+        reason: "no-organization-scope-in-context",
       };
     }
 
@@ -47,7 +47,7 @@ class RBACEvaluator {
       if (!matchingRole) {
         return {
           evaluator: EvaluatorType.RBAC,
-          effect: DecisionEffect.NOT_APPLICABLE,
+          effect: DecisionEffect.DENY,
           reason: "no-role-grants-this-action",
         };
       }

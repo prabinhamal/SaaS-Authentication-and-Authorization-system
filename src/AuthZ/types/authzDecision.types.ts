@@ -40,6 +40,7 @@ export interface EvaluatorDecision {
 export interface ComposedDecision {
   effect: FinalEffect;
   evaluations: EvaluatorDecision[];
+  reason?: string;  
   composedAt: string;
   modelVersion?: string;
   policyVersion?: string;
