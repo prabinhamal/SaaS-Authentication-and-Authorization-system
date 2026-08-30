@@ -20,7 +20,7 @@ export interface AuthZSubject {
   type: SubjectType;
 }
 
-type AuthZAction = string;
+export type AuthZAction = string;
 
 export interface AuthZResource {
   id: string;

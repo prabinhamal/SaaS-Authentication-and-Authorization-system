@@ -47,7 +47,7 @@ export class RBACEvaluator {
       if (!matchingRole) {
         return {
           evaluator: EvaluatorType.RBAC,
-          effect: DecisionEffect.DENY,
+          effect: DecisionEffect.NOT_APPLICABLE,
           reason: "no-role-grants-this-action",
         };
       }
