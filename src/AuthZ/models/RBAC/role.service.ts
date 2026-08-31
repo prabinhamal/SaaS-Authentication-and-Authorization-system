@@ -9,6 +9,7 @@ export class RoleService {
     name: string;
     permissions: string[];
     description?: string;
+    isSystemRole?: boolean;
   }): Promise<IRole> {
     const existing = await this.roleRepository.findByName(input.name);
     if (existing) {
@@ -18,6 +19,7 @@ export class RoleService {
       name: input.name.toLowerCase(),
       permissions: input.permissions,
       ...(input.description && { description: input.description }),
+      isSystemRole: input.isSystemRole ?? false,
     });
   }
 
