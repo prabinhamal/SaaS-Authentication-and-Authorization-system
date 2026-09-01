@@ -13,7 +13,7 @@ export class RoleService {
   }): Promise<IRole> {
     const existing = await this.roleRepository.findByName(input.name);
     if (existing) {
-      throw new ConflictError(`Role "${input.name}" is alrady exists.`);
+      throw new ConflictError(`Role "${input.name}" alrady exists.`);
     }
     return this.roleRepository.create({
       name: input.name.toLowerCase(),

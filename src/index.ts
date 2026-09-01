@@ -11,6 +11,7 @@ import mfaRouter from "./routes/mfa.route"
 import { connectRedis } from "./config/redis.config";
 import corsMiddleware from "./middleware/cors";
 import mfaRecoveryRouter from "./routes/mfaRecovery.route"
+import rolesRouter from "./routes/role.route"
 
 
 const app: Express = express();
@@ -30,6 +31,7 @@ app.use("/api/v1/", authRouter)
 app.use("/api/v1/", userRouter)
 app.use("/api/v1/", mfaRouter)
 app.use("/api/v1/mfa/recovery/", mfaRecoveryRouter)
+app.use("/api/v1/roles/", rolesRouter)
 
 /// global error handel
 app.use(notFoundHandler);
