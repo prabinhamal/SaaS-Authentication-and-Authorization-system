@@ -11,13 +11,22 @@ export class RBACEvaluator {
   constructor(private readonly roleAssignmentService: RoleAssignmentService) {}
 
   async evaluateRbac(request: AuthzRequest): Promise<EvaluatorDecision> {
-    const organizationId = request.context?.organizationId;
-
-    if (!organizationId) {
+    // const organizationId = request.context?.organizationId;
+    const scope = request.context?.scope;
+    const targetScope = request.context?.targetScope;
+    if (!scope) {
       return {
         evaluator: EvaluatorType.RBAC,
         effect: DecisionEffect.NOT_APPLICABLE,
-        reason: "no-organization-scope-in-context",
+        reason: "no-scope-in-context",
+      };
+    }
+
+    if (targetScope && (targetScope.type !== scope.type || targetScope.id !== scope.id)) {
+      return {
+        evaluator: EvaluatorType.RBAC,
+        effect: DecisionEffect.DENY,
+        reason: "target-scope-outside-request-scope",
       };
     }
 
@@ -26,10 +35,11 @@ export class RBACEvaluator {
         await this.roleAssignmentService.getActiveRolesForSubjectAtScope(
           request.subject.id,
           request.subject.type,
-          {
-            type: ScopeType.ORGANIZATION,
-            id: organizationId,
-          },
+          // {
+          //   type: ScopeType.ORGANIZATION,
+          //   id: organizationId,
+          // },
+          scope
         );
 
       if (roles.length === 0) {
@@ -39,6 +49,8 @@ export class RBACEvaluator {
           reason: "no-role-assignments-at-scope",
         };
       }
+
+      // console.log("Roles: ", roles)
 
       const matchingRole = roles.find((role) =>
         role.permissions.includes(request.action),

@@ -13,7 +13,7 @@ const roleAssignmentController = new RoleAssignmentController(
   authzContainer.roleAssignmentService,
 );
 
-router.post( "/", auth, authorize("role-assignment:create", { resourceType: "role-assignment", resourceId: (req) => req.body.subjectId, }), roleAssignmentController.createAssignment);
+router.post( "/", auth, authorize("role-assignment:create", { resourceType: "role-assignment", resourceId: (req) => req.body.subjectId, targetScope: (req) => req.body.scope }), roleAssignmentController.createAssignment);
 
 router.get( "/:id", auth, authorize("role-assignment:read", { resourceType: "role-assignment", resourceId: (req) => req.params.id as string }), roleAssignmentController.getAssignmentById,);
 

@@ -57,7 +57,7 @@ export class RoleAssignmentService {
 
     if(assignments.length === 0) return [];
 
-    const roleIds = assignments.map((a)=>a.roleId);
+    const roleIds =  [...new Set(assignments.map((assignment) => assignment.roleId.toString()))];
     const roles = await this.roleRepository.findByIds(roleIds);
     return roles;
   }

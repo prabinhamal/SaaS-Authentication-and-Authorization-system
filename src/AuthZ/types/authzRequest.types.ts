@@ -1,3 +1,5 @@
+import { IScope } from "./scope.types";
+
 export enum SubjectType {
   USER = "user",
   SERVICE = "service",
@@ -28,7 +30,9 @@ export interface AuthZResource {
 }
 
 export interface AuthZContext {
-  organizationId?: string;
+  // organizationId?: string;
+  scope?: IScope;
+  targetScope?: IScope;
   authenticationStrength?: AuthenticationStrength;
   requestOrigin?: RequestOrigin;
 

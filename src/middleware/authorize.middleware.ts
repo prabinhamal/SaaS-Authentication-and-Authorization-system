@@ -9,10 +9,12 @@ import {
 } from "../AuthZ";
 import { ForbiddenError, UnAuthorizedError } from "../utils/AppError";
 import { resolveContext } from "../AuthZ/context/contextResolver";
+import { IScope } from "../AuthZ/types/scope.types";
 
 interface AuthorizeOptions {
   resourceType: string;
   resourceId: (req: Request) => string;
+  targetScope?: (req: Request) => IScope;
 }
 
 export function authorize(action: AuthZAction, options: AuthorizeOptions) {
@@ -25,12 +27,19 @@ export function authorize(action: AuthZAction, options: AuthorizeOptions) {
 
     const correlationId = (req.headers["x-request-id"] as string) ?? randomUUID();
 
+    const context = resolveContext(req);
+    const targetScope = options.targetScope?.(req);
 
     const authzRequest: AuthzRequest = {
       subject: { id: userId, type: SubjectType.USER },
       action,
       resource: { id: options.resourceId(req), type: options.resourceType },
-      context: resolveContext(req),
+      context: {
+        ...context,
+        ...(targetScope && {
+          targetScope,
+        }),
+      },
       correlationId,
     };
 
@@ -42,6 +51,8 @@ export function authorize(action: AuthZAction, options: AuthorizeOptions) {
       subject: authzRequest.subject.id,
       action,
       resource: authzRequest.resource.id,
+      scope: authzRequest.context?.scope,
+      targetScope: authzRequest.context?.targetScope,
       effect: decision.effect,
       reason: decision.reason,
     });
