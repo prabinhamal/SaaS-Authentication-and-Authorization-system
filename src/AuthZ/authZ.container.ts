@@ -8,6 +8,7 @@ import { RoleRepository } from "./models/RBAC/role.repository";
 import { RoleService } from "./models/RBAC/role.service";
 import { RoleAssignmentRepository } from "./models/RBAC/roleAssignment.repository";
 import { RoleAssignmentService } from "./models/RBAC/roleAssignment.service";
+import { RoleHierarchyService } from "./models/RBAC/roleHierarchy.service";
 
 export class AuthZContainer {
   readonly roleRepository: RoleRepository;
@@ -22,6 +23,8 @@ export class AuthZContainer {
 
   readonly authZService: AuthZService;
 
+  readonly roleHierarchyService: RoleHierarchyService;
+
   constructor() {
     this.roleRepository = new RoleRepository();
     this.roleAssignmentRepository = new RoleAssignmentRepository();
@@ -35,8 +38,14 @@ export class AuthZContainer {
       this.roleRepository,
     );
 
+    this.roleHierarchyService = new RoleHierarchyService(
+      this.roleRepository, 
+      this.roleService
+    );
+
     this.rbacEvaluator = new RBACEvaluator(
       this.roleAssignmentService,
+      this.roleHierarchyService
     );
 
     this.decisionComposer = new DecisionComposer();

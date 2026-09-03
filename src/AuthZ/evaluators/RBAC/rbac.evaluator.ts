@@ -1,14 +1,17 @@
 import { RoleAssignmentService } from "../../models/RBAC/roleAssignment.service";
+import { RoleHierarchyService } from "../../models/RBAC/roleHierarchy.service";
 import {
   DecisionEffect,
   EvaluatorDecision,
   EvaluatorType,
 } from "../../types/authzDecision.types";
 import { AuthzRequest } from "../../types/authzRequest.types";
-import { ScopeType } from "../../types/scope.types";
+
 
 export class RBACEvaluator {
-  constructor(private readonly roleAssignmentService: RoleAssignmentService) {}
+  constructor(private readonly roleAssignmentService: RoleAssignmentService,
+    private readonly roleHierarchyService: RoleHierarchyService
+  ) {}
 
   async evaluateRbac(request: AuthzRequest): Promise<EvaluatorDecision> {
     // const organizationId = request.context?.organizationId;
@@ -52,25 +55,28 @@ export class RBACEvaluator {
 
       // console.log("Roles: ", roles)
 
-      const matchingRole = roles.find((role) =>
-        role.permissions.includes(request.action),
-      );
+      // const matchingRole = roles.find((role) =>
+      //   role.permissions.includes(request.action),
+      // );
 
-      if (!matchingRole) {
-        return {
-          evaluator: EvaluatorType.RBAC,
-          effect: DecisionEffect.NOT_APPLICABLE,
-          reason: "no-role-grants-this-action",
-        };
+      for (const role of roles) {
+        const effectivePermissions =await this.roleHierarchyService.getEffectivePermissions(role._id);
+
+        if (effectivePermissions.includes(request.action)) {
+          return {
+            evaluator: EvaluatorType.RBAC,
+            effect: DecisionEffect.ALLOW,
+            reason: `granted-via-role:${role.name}`,
+            policyRef: role._id.toString(),
+          };
+        }
       }
 
       return {
         evaluator: EvaluatorType.RBAC,
-        effect: DecisionEffect.ALLOW,
-        reason: `granted-via-role:${matchingRole.name}`,
-        policyRef: matchingRole._id.toString(),
+        effect: DecisionEffect.NOT_APPLICABLE,
+        reason: "no-role-grants-this-action",
       };
-      
     } catch (error: any) {
       return {
         evaluator: EvaluatorType.RBAC,

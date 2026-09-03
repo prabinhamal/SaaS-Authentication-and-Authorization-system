@@ -23,6 +23,10 @@ export const AUTHZ_ROLE_CATALOG = [
       "role-assignment:read",
       "role-assignment:update",
       "role-assignment:revoke",
+
+      "role-hierarchy:create",
+      "role-hierarchy:read",
+      "role-hierarchy:delete",
     ],
     isSystemRole: true,
   },
@@ -32,7 +36,6 @@ export const AUTHZ_ROLE_CATALOG = [
     description: "Default organization member role",
     permissions: [
       "organization:read",
-
       "project:create",
       "project:read",
       "project:update",

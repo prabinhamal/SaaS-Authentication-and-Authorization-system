@@ -13,6 +13,7 @@ import corsMiddleware from "./middleware/cors";
 import mfaRecoveryRouter from "./routes/mfaRecovery.route"
 import rolesRouter from "./routes/role.route"
 import roleAssignmentRouter from "./routes/roleAssignment.route"
+import roleHierarchyRouter from "./routes/roleHierarchy.route"
 
 const app: Express = express();
 
@@ -33,6 +34,7 @@ app.use("/api/v1/", mfaRouter)
 app.use("/api/v1/mfa/recovery/", mfaRecoveryRouter)
 app.use("/api/v1/roles/", rolesRouter)
 app.use("/api/v1/role-assignments", roleAssignmentRouter);
+app.use("/api/v1/role-hierarchy", roleHierarchyRouter)
 
 /// global error handel
 app.use(notFoundHandler);
