@@ -8,6 +8,7 @@ export interface IRole extends Document {
     name: string;
     description?: string;
     permissions: string[];
+    parentRoleIds: Types.ObjectId[],
     isSystemRole: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -32,6 +33,11 @@ const roleSchema = new Schema<IRole>({
     permissions: {
         type: [String],
         required: [true,"permissions are required."],
+        default: [],
+    },
+    parentRoleIds: {
+        type: [Schema.Types.ObjectId],
+        ref: "Role",
         default: [],
     },
     isSystemRole: {

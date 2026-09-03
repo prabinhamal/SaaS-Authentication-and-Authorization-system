@@ -30,6 +30,10 @@ export class RoleRepository {
         return RoleModel.findByIdAndUpdate(id, data, {returnDocument: "after", runValidators: true,}).lean().exec();
     }
 
+    async updateParentRoles(id: string | Types.ObjectId, parentRoleIds: Types.ObjectId[]): Promise<IRole | null> {
+        return RoleModel.findByIdAndUpdate(id, {parentRoleIds}, { returnDocument: "after", runValidators: true}).lean().exec();
+    }
+
     async delete(id: string | Types.ObjectId): Promise<IRole | null>{
         return RoleModel.findByIdAndDelete(id).lean().exec()
     }

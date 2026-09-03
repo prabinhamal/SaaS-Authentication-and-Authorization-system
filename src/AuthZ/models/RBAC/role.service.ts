@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../../utils/AppError";
 import { RoleRepository } from "./role.repository";
 import { IRole } from "./role.schema";
@@ -23,7 +24,7 @@ export class RoleService {
     });
   }
 
-  async getRoleById(id: string): Promise<IRole> {
+  async getRoleById(id: string | Types.ObjectId): Promise<IRole> {
     const role = await this.roleRepository.findById(id);
     if (!role) throw new NotFoundError("Role not found.");
     return role;
