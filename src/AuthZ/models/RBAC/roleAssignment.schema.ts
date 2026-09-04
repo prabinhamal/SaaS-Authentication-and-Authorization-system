@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
-import { IScope, ScopeType } from "../../types/scope.types";
+import { IScope, ScopeType } from "../../scope/scope.types";
 import { SubjectType } from "../../types/authzRequest.types";
 
 export interface IRoleAssignment extends Document {

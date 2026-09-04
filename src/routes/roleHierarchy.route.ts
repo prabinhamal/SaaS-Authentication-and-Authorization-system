@@ -6,6 +6,7 @@ import { auth } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/authorize.middleware";
 import { RoleHierarchyController } from "../controllers/roleHierarchy.controller";
 import { authzContainer } from "../AuthZ";
+import { AUTHZ_PERMISSIONS, AUTHZ_RESOURCES } from "../AuthZ/permissions/authz.permissions";
 
 const router: Router = Router();
 
@@ -17,8 +18,8 @@ const roleHierarchyController = new RoleHierarchyController(
 router.post(
   "/parent",
   auth,
-  authorize("role-hierarchy:create", {
-    resourceType: "role-hierarchy",
+  authorize(AUTHZ_PERMISSIONS.ROLE_HIERARCHY.CREATE, {
+    resourceType: AUTHZ_RESOURCES.ROLE_HIERARCHY,
     resourceId: (req) => req.body.childRoleId,
   }),
   roleHierarchyController.addParentRole,
@@ -27,8 +28,8 @@ router.post(
 router.delete(
   "/parent",
   auth,
-  authorize("role-hierarchy:delete", {
-    resourceType: "role-hierarchy",
+  authorize(AUTHZ_PERMISSIONS.ROLE_HIERARCHY.DELETE, {
+    resourceType: AUTHZ_RESOURCES.ROLE_HIERARCHY,
     resourceId: (req) => req.body.childRoleId,
   }),
   roleHierarchyController.removeParentRole,
@@ -37,8 +38,8 @@ router.delete(
 router.get(
   "/:id/parents",
   auth,
-  authorize("role-hierarchy:read", {
-    resourceType: "role-hierarchy",
+  authorize(AUTHZ_PERMISSIONS.ROLE_HIERARCHY.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE_HIERARCHY,
     resourceId: (req) => req.params.id as string,
   }),
   roleHierarchyController.getParentRoles,
@@ -47,8 +48,8 @@ router.get(
 router.get(
   "/:roleId/inherited",
   auth,
-  authorize("role-hierarchy:read", {
-    resourceType: "role-hierarchy",
+  authorize(AUTHZ_PERMISSIONS.ROLE_HIERARCHY.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE_HIERARCHY,
     resourceId: (req) => req.params.roleId as string,
   }),
   roleHierarchyController.resolveInheritedRoles,
@@ -57,11 +58,10 @@ router.get(
 router.get(
   "/:roleId/effective-permissions",
   auth,
-  authorize("role-hierarchy:read", {
-    resourceType: "role-hierarchy",
+  authorize(AUTHZ_PERMISSIONS.ROLE_HIERARCHY.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE_HIERARCHY,
     resourceId: (req) => req.params.roleId as string,
   }),
   roleHierarchyController.getEffectivePermissions,
 );
-
 export default router;

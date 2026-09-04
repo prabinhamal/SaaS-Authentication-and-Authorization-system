@@ -13,10 +13,7 @@ import { authorize } from "../middleware/authorize.middleware";
 const router: Router = Router();
 
 
-router.get( "/me", auth, authorize("user:read", {
-    resourceType: "user",
-    resourceId: (req) => req.user!._id.toString(),
-  }), getMe);
+router.get( "/me", auth, getMe);
 router.get("/sessions", auth, getUserSessions);
 
 

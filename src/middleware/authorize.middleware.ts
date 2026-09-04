@@ -8,8 +8,9 @@ import {
   SubjectType,
 } from "../AuthZ";
 import { ForbiddenError, UnAuthorizedError } from "../utils/AppError";
-import { resolveContext } from "../AuthZ/context/contextResolver";
-import { IScope } from "../AuthZ/types/scope.types";
+import { resolveContext } from "../AuthZ/context/context.resolver";
+import { IScope } from "../AuthZ/scope/scope.types";
+
 
 interface AuthorizeOptions {
   resourceType: string;

@@ -107,19 +107,19 @@ class UserServices {
     return methods;
   }
 
-  sanitizeUser = (user: UserDocument) => {
-    const userObject = user.toObject();
+  sanitizeUser = (user: IUser) => {
+    // const userObject = user.toObject();
 
     return {
-      _id: userObject._id,
-      userName: userObject.userName,
-      email: userObject.email,
-      isEmailVerified: userObject.isEmailVerified,
-      authProvider: userObject.authProvider,
-      role: userObject.role,
-      status: userObject.status,
-      createdAt: userObject.createdAt,
-      updatedAt: userObject.updatedAt,
+      _id: user._id,
+      userName: user.userName,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+      authProvider: user.authProvider,
+      role: user.role,
+      status: user.status,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   };
 }

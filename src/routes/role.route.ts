@@ -4,6 +4,7 @@ import { auth } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/authorize.middleware";
 import { RoleController } from "../controllers/role.controller";
 import { authzContainer } from "../AuthZ";
+import { AUTHZ_PERMISSIONS, AUTHZ_RESOURCES } from "../AuthZ/permissions/authz.permissions";
 
 const router: Router = Router();
 
@@ -12,9 +13,9 @@ const roleController = new RoleController(authzContainer.roleService);
 router.post(
   "/",
   auth,
-  authorize("role:create", {
-    resourceType: "role",
-    resourceId: () => "role",
+ authorize(AUTHZ_PERMISSIONS.ROLE.CREATE, {
+    resourceType: AUTHZ_RESOURCES.ROLE,
+    resourceId: () => AUTHZ_RESOURCES.ROLE,
   }),
   roleController.createRole,
 );
@@ -22,9 +23,9 @@ router.post(
 router.get(
   "/",
   auth,
-  authorize("role:read", {
-    resourceType: "role",
-    resourceId: () => "role",
+  authorize(AUTHZ_PERMISSIONS.ROLE.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE,
+    resourceId: () => AUTHZ_RESOURCES.ROLE,
   }),
   roleController.listRoles,
 );
@@ -32,8 +33,8 @@ router.get(
 router.get(
   "/:id",
   auth,
-  authorize("role:read", {
-    resourceType: "role",
+  authorize(AUTHZ_PERMISSIONS.ROLE.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE,
     resourceId: (req) => req.params.id as string,
   }),
   roleController.getRoleById,
@@ -42,8 +43,8 @@ router.get(
 router.patch(
   "/:id",
   auth,
-  authorize("role:update", {
-    resourceType: "role",
+  authorize(AUTHZ_PERMISSIONS.ROLE.UPDATE, {
+    resourceType: AUTHZ_RESOURCES.ROLE,
     resourceId: (req) => req.params.id as string,
   }),
   roleController.updateRole,
@@ -52,8 +53,8 @@ router.patch(
 router.delete(
   "/:id",
   auth,
-  authorize("role:delete", {
-    resourceType: "role",
+  authorize(AUTHZ_PERMISSIONS.ROLE.DELETE, {
+    resourceType: AUTHZ_RESOURCES.ROLE,
     resourceId: (req) => req.params.id as string,
   }),
   roleController.deleteRole,

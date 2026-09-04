@@ -1,7 +1,8 @@
 import { Types } from "mongoose";
 import { SubjectType } from "../../types/authzRequest.types";
 import RoleAssignmentModel, { IRoleAssignment } from "./roleAssignment.schema";
-import { IScope } from "../../types/scope.types";
+import { IScope } from "../../scope/scope.types";
+
 
 
 

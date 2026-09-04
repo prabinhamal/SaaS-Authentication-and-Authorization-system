@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 import { ConflictError, NotFoundError } from "../../../utils/AppError";
 import { SubjectType } from "../../types/authzRequest.types";
-import { IScope } from "../../types/scope.types";
+import { IScope } from "../../scope/scope.types";
 import { RoleRepository } from "./role.repository";
 import { RoleAssignmentRepository } from "./roleAssignment.repository";
 import { IRoleAssignment } from "./roleAssignment.schema";

@@ -6,6 +6,7 @@ import { auth } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/authorize.middleware";
 import { RoleAssignmentController } from "../controllers/roleAssignment.controller";
 import { authzContainer } from "../AuthZ";
+import { AUTHZ_PERMISSIONS, AUTHZ_RESOURCES } from "../AuthZ/permissions/authz.permissions";
 
 const router: Router = Router();
 
@@ -13,16 +14,33 @@ const roleAssignmentController = new RoleAssignmentController(
   authzContainer.roleAssignmentService,
 );
 
-router.post( "/", auth, authorize("role-assignment:create", { resourceType: "role-assignment", resourceId: (req) => req.body.subjectId, targetScope: (req) => req.body.scope }), roleAssignmentController.createAssignment);
+router.post(
+  "/",
+  auth,
+  authorize(AUTHZ_PERMISSIONS.ROLE_ASSIGNMENT.CREATE, {
+    resourceType: AUTHZ_RESOURCES.ROLE_ASSIGNMENT,
+    resourceId: (req) => req.body.subjectId,
+    targetScope: (req) => req.body.scope,
+  }),
+  roleAssignmentController.createAssignment,
+);
 
-router.get( "/:id", auth, authorize("role-assignment:read", { resourceType: "role-assignment", resourceId: (req) => req.params.id as string }), roleAssignmentController.getAssignmentById,);
+router.get(
+  "/:id",
+  auth,
+  authorize(AUTHZ_PERMISSIONS.ROLE_ASSIGNMENT.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE_ASSIGNMENT,
+    resourceId: (req) => req.params.id as string,
+  }),
+  roleAssignmentController.getAssignmentById,
+);
 
 router.get(
   "/subject/:subjectId",
   auth,
-  authorize("role-assignment:read", {
-    resourceType: "user",
-    resourceId: (req) => req.params.subjectId as string
+  authorize(AUTHZ_PERMISSIONS.ROLE_ASSIGNMENT.READ, {
+    resourceType: AUTHZ_RESOURCES.ROLE_ASSIGNMENT,
+    resourceId: (req) => req.params.subjectId as string,
   }),
   roleAssignmentController.listAssignmentsForSubject,
 );
@@ -30,9 +48,9 @@ router.get(
 router.patch(
   "/:id",
   auth,
-  authorize("role-assignment:update", {
-    resourceType: "role-assignment",
-    resourceId: (req) => req.params.id as string
+  authorize(AUTHZ_PERMISSIONS.ROLE_ASSIGNMENT.UPDATE, {
+    resourceType: AUTHZ_RESOURCES.ROLE_ASSIGNMENT,
+    resourceId: (req) => req.params.id as string,
   }),
   roleAssignmentController.updateAssignment,
 );
@@ -40,11 +58,10 @@ router.patch(
 router.delete(
   "/:id",
   auth,
-  authorize("role-assignment:revoke", {
-    resourceType: "role-assignment",
-    resourceId: (req) => req.params.id as string
+  authorize(AUTHZ_PERMISSIONS.ROLE_ASSIGNMENT.REVOKE, {
+    resourceType: AUTHZ_RESOURCES.ROLE_ASSIGNMENT,
+    resourceId: (req) => req.params.id as string,
   }),
   roleAssignmentController.revokeAssignment,
 );
-
 export default router;

@@ -1,4 +1,5 @@
-import { IScope } from "./scope.types";
+import { IScope } from "../scope/scope.types";
+
 
 export enum SubjectType {
   USER = "user",

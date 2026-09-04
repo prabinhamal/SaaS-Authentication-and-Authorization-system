@@ -85,10 +85,11 @@ const refreshTokens = asyncHandler(async (req: Request, res: Response) => {
     deviceId: result.deviceId,
   });
 
+  const sanitizeUserData = userService.sanitizeUser(result.user)
   return ResponseSend.success(
     res,
     "Token refreshed successfully",
-    { user: result.user, accessToken: result.accessToken },
+    { user: sanitizeUserData, accessToken: result.accessToken },
     HTTP_STATUS.OK,
   );
 });

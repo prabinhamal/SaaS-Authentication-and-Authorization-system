@@ -1,4 +1,5 @@
 
+
 export enum ScopeType {
   ORGANIZATION = "organization",
   PROJECT = "project",
@@ -10,3 +11,4 @@ export interface IScope {
     type: ScopeType;
     id: string;
 }
+
